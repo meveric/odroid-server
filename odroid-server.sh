@@ -28,7 +28,8 @@ prerequirements()
 	echo -e "\033[1;36mWe wanna make sure necessary packages are installed\033[0;0m"
 	sleep 5
 	apt-get update
-        apt-get -y install axel git xz-utils whiptail unzip wget
+	# in case someone removed these
+        apt-get -y install git whiptail
 }
 
 update_scripts() 

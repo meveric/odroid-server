@@ -7,7 +7,9 @@ do
 		"2" "Change Hostname - (NOT INCLUDED YET)" \
                 "3" "Install and configure DHCP-Server - (NOT INCLUDED YET)" \
                 "4" "Install and configure DNS-Server (Bind) - (NOT INCLUDED YET)" \
-                "5" "Install amd configure OwnCloud Server - (NOT INCLUDED YET)" \
+                "5" "Install and configure OwnCloud Server - (NOT INCLUDED YET)" \
+		"6" "Install and configure Samba 4 Active Directory Domain - (NOT INCLUDED YET)" \
+		"7" "Install and configure Samba Server (Windows File Sharing) - (NOT INCLUDED YET)" \
                 3>&1 1>&2 2>&3)
 
 	RET=$?
@@ -21,6 +23,8 @@ do
 		"3") . $HOMEDIR/dhcp_server.sh ;;
 		"4") . $HOMEDIR/dns_server.sh ;;
 		"5") . $HOMEDIR/owncloud_server.sh ;;
+		"6") . $HOMEDIR/ad_server.sh ;;
+		"7") . $HOMEDIR/samba_server.sh ;;
 		*) msgbox "Error 001. Please report on the forums" && exit 0 ;;
 		esac || msgbox "I don't know how you got here! >> $CC <<  Report on the forums"
 	fi
