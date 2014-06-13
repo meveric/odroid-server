@@ -3,7 +3,7 @@
 # ODROID Server Setup
 
 # For debug uncomment
-# set -x
+ set -x
 
 # Global defines
 HOMEDIR="/root/odroid-server"
@@ -27,7 +27,13 @@ prerequirements()
 {
 	echo -e "\033[1;36mWe wanna make sure necessary packages are installed\033[0;0m"
 	sleep 5
-	apt-get update
+	#only check for updates once a day not every single time
+	LAST_UPDATE=`stat -c %Y /var/lib/apt/periodic/update-success-stamp`
+	DATE=`date +%s`
+	UPDATE_AGE=$(($DATE-$LAST_UPDATE))
+	if [ $UPDATE_AGE -gt $((60*60*24)) ]; then
+		apt-get update
+	fi
 	# in case someone removed these
         apt-get -y install git whiptail
 }

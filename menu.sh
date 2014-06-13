@@ -1,10 +1,13 @@
 #!/bin/bash
-
 while true
 do
-	CC=$(whiptail --backtitle "ODROID Server Menu" --menu "Main Menu" 0 0 1 --cancel-button "Exit" --ok-button "Select" \
-		"1" "Set/Change local IP address - (NOT INCLUDED YET)" \
-		"2" "Change Hostname - (NOT INCLUDED YET)" \
+	if [ ! -z $REBOOT ]; then
+        	RESTART="--- restart required ---"
+	fi
+	TITLE="ODROID Server Setup $RESTART"
+	CC=$(whiptail --backtitle "$TITLE" --menu "Main Menu" 0 0 1 --cancel-button "Exit" --ok-button "Select" \
+		"1" "Set/Change local IP address (eth0 only)" \
+		"2" "Change Hostname" \
                 "3" "Install and configure DHCP-Server - (NOT INCLUDED YET)" \
                 "4" "Install and configure DNS-Server (Bind) - (NOT INCLUDED YET)" \
                 "5" "Install and configure OwnCloud Server - (NOT INCLUDED YET)" \
