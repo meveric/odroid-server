@@ -22,7 +22,7 @@ EOF
 	sleep 3
 	return 0
 
-# TODO: check for additional ethernet and wlan?
+# TODO check for additional ethernet and wlan?
 }
 
 set_static()
@@ -46,19 +46,38 @@ EOF
 	# get current IP of possible
 	CURRENT_IP=`ifconfig | grep -n1 eth0 | grep "inet addr:" | cut -d ":" -f2 | cut -d " " -f1`
 	CC=$(whiptail --backtitle "$TITLE" --inputbox "IP-Address" 0 20 "$CURRENT_IP" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
+	if [ -z $CC ]; then
+		msgbox "IP-Address can not be left blank!
+A valid IP-Address looks something like 192.168.0.1"
+		. $HOMEDIR/change_ip.sh static
+		return 0
+	fi
 	echo "	address $CC" >> /etc/network/interfaces
 	CURRENT_NETMASK=`ifconfig | grep -n1 eth0 | grep "Mask:" | cut -d ":" -f4`
 	CC=$(whiptail --backtitle "$TITLE" --inputbox "Netmask" 0 20 "$CURRENT_NETMASK" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
+	if [ -z $CC ]; then
+		msgbox "Netmask can not be left blank!
+A valid Netmask looks something like 255.255.255.0"
+		. $HOMEDIR/change_ip.sh static
+		return 0
+	fi
 	echo "	netmask $CC" >> /etc/network/interfaces
 	CURRENT_GATEWAY=`route -n  | grep ^0.0.0.0 | awk '{print $2}'`
 	CC=$(whiptail --backtitle "$TITLE" --inputbox "Gateway Server (Router-IP)" 0 20 "$CURRENT_GATEWAY" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
-	echo "	gateway $CC" >> /etc/network/interfaces
+	if [ ! -z $CC ]; then
+		echo "	gateway $CC" >> /etc/network/interfaces
+	fi
 	CURRENT_DNS=`cat /etc/resolv.conf  | grep ^nameserver | head -n 1 | awk '{print $2}'`
 	CC=$(whiptail --backtitle "$TITLE" --inputbox "DNS Server (separate multiple DNS by space)" 0 20 "$CURRENT_DNS" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
-	echo "	dns-nameservers $CC" >> /etc/network/interfaces
+	# TODO use 127.0.0.1 as DNS instead?
+	if [ ! -z $CC ]; then
+		echo "	dns-nameservers $CC" >> /etc/network/interfaces
+	fi
 	CURRENT_SEARCH=`cat /etc/resolv.conf  | grep ^search | head -n 1 | awk '{print $2}'`
         CC=$(whiptail --backtitle "$TITLE" --inputbox "Search Domain" 0 20 "$CURRENT_SEARCH" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
-        echo "	dns-search $CC" >> /etc/network/interfaces
+	if [ ! -z $CC ]; then
+		echo "	dns-search $CC" >> /etc/network/interfaces
+	fi
 	# restarting network
 	echo -e "\033[1;36mRestarting network\033[0;0m"
 	sleep 3
@@ -87,9 +106,9 @@ ask_kind()
 	fi
 }
 if [ ! -z $1 ]; then
-	if [ $1 -eq 1 ]; then
+	if [ $1 = "dhcp" ]; then
 		set_dhcp
-	elif [ $1 -eq 2 ]; then
+	elif [ $1 = "static" ]; then
 		set_static
 	fi
 else
