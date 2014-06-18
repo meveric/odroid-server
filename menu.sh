@@ -10,7 +10,7 @@ do
 		"2" "Change Hostname" \
 		"3" "resize partition to full size" \
                 "4" "Install and configure DHCP-Server (eth0 only)" \
-                "5" "Install and configure DNS-Server (Bind) - (NOT INCLUDED YET)" \
+                "5" "Install and configure DNS-Server (Bind) - (basic functions only)" \
                 "6" "Install and configure OwnCloud Server - (NOT INCLUDED YET)" \
 		"7" "Install and configure Samba 4 Active Directory Domain - (NOT INCLUDED YET)" \
 		"8" "Install and configure Samba Server (Windows File Sharing) - (NOT INCLUDED YET)" \
