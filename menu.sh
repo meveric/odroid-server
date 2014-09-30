@@ -15,7 +15,7 @@ do
 		" 7" "Install and configure Samba 4 Active Directory Domain - (NOT INCLUDED YET)" \
 		" 8" "Install and configure Samba Server (Windows File Sharing) - (NOT INCLUDED YET)" \
 		" 9" "Install and configure OpenVPN (VPN Server) - (NOT INCLUDED YET)" \
-		"10" "Install and configure PPPOE (DSL Internet connection) - (NOT INCLUDED YET)" \
+		"10" "Install and configure PPPOE (DSL Internet connection - on eth0)" \
                 3>&1 1>&2 2>&3)
 
 	RET=$?
