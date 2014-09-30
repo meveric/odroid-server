@@ -21,6 +21,13 @@ do
 	RET=$?
 
 	if [ $RET -eq 1 ]; then
+		if [ ! -z $REBOOT ]; then
+			CC=$(whiptail --backtitle "$TITLE" --yesno "System needs to reboot for changes to take effect.
+Do you want to reboot now?" 0 0 3>&1 1>&2 2>&3)
+			if [ $? -eq 0 ]; then
+				reboot
+			fi
+		fi
 		exit 1
 	elif [ $RET -eq 0 ]; then
 		case "$CC" in
@@ -38,4 +45,3 @@ do
 		esac || msgbox "I don't know how you got here! >> $CC <<  Report on the forums"
 	fi
 done
-

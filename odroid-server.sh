@@ -28,7 +28,7 @@ prerequirements()
 	echo -e "\033[1;36mWe wanna make sure necessary packages are installed\033[0;0m"
 	sleep 5
 	#only check for updates once a day not every single time
-	LAST_UPDATE=`stat -c %Y /var/lib/apt/periodic/update-success-stamp`
+	LAST_UPDATE=`stat -c %Y /var/cache/apt/pkgcache.bin`
 	DATE=`date +%s`
 	UPDATE_AGE=$(($DATE-$LAST_UPDATE))
 	if [ $UPDATE_AGE -gt $((60*60*24)) ]; then
