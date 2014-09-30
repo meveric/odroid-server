@@ -1,3 +1,4 @@
 resize partition
 lvm ?
-
+openvpn
+pppoe

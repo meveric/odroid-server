@@ -1,19 +1,5 @@
 #!/bin/bash
 
-	AC=$(whiptail --backtitle "$TITLE" --yesno "Before running this, you must be sure that /dev/mmcblk0 is your root partition.
-		To do this make sure you are booting the eMMC or the microSD ALONE!.
-		
-		DO YOU WANT TO CONTINUE?" 0 0 3>&1 1>&2 2>&3)
-	
-	result=$?
-	if [ $result -eq 0 ]; then
-		do_resize
-	elif [ $result -eq 1 ]; then
-		return 0
-	fi	
-	
-	return 0		
-
 do_resize() {
 	# this takes in consideration /dev/mmcblk0p2 as the rootfs! 
 	rsflog=/root/resize-$DATE-log.txt
@@ -71,3 +57,18 @@ EOF
   msgbox "Rootfs Extended. Please reboot to take effect"
   return 0
 }
+
+        AC=$(whiptail --backtitle "$TITLE" --yesno "Before running this, you must be sure that /dev/mmcblk0p2 is your root partition.
+                To do this make sure you are booting the eMMC or the microSD ALONE!.
+                
+                DO YOU WANT TO CONTINUE?" 0 0 3>&1 1>&2 2>&3)
+
+        result=$?
+        if [ $result -eq 0 ]; then
+                do_resize
+        elif [ $result -eq 1 ]; then
+                return 0
+        fi
+
+        return 0
+

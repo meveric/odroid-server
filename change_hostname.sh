@@ -3,7 +3,7 @@
 letters 'a' to 'z'
 numbers '0' to '9'
 and hyphen (-)
-Note that a hostname cannot beggin or end with a hyphen.
+Note that a hostname cannot begin or end with a hyphen.
 	
 No other char/symbol/punctuation or white-spaces are allowed." 0 0 0
 	
