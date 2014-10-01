@@ -65,7 +65,8 @@ A valid IP-Address looks something like 192.168.0.1"
 		. $HOMEDIR/change_ip.sh static $1
 		return 0
 	fi
-	config="	address $CC"
+	config="
+	address $CC \\"
 	CURRENT_NETMASK=`ifconfig | grep -n1 $1 | grep "Mask:" | cut -d ":" -f4`
 	CC=$(whiptail --backtitle "$TITLE" --inputbox "Netmask" 0 20 "$CURRENT_NETMASK" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
 	if [ -z $CC ]; then
@@ -74,22 +75,26 @@ A valid Netmask looks something like 255.255.255.0"
 		. $HOMEDIR/change_ip.sh static $1
 		return 0
 	fi
-	config="$config\n	netmask $CC"
+	config="$config
+	netmask $CC \\"
 	CURRENT_GATEWAY=`route -n  | grep ^0.0.0.0 | awk '{print $2}'`
 	CC=$(whiptail --backtitle "$TITLE" --inputbox "Gateway Server (Router-IP)" 0 20 "$CURRENT_GATEWAY" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
 	if [ ! -z $CC ]; then
-		config="$config\n	gateway $CC"
+		config="$config
+	gateway $CC \\"
 	fi
 	CURRENT_DNS=`cat /etc/resolv.conf  | grep ^nameserver | head -n 1 | awk '{print $2}'`
 	CC=$(whiptail --backtitle "$TITLE" --inputbox "DNS Server (separate multiple DNS by space)" 0 20 "$CURRENT_DNS" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
 	# TODO use 127.0.0.1 as DNS instead?
-	if [ ! -z $CC ]; then
-		config="$config\n	dns-nameservers $CC"
+	if [ "x$CC" != "x"  ]; then
+		config="$config
+	dns-nameservers $CC \\"
 	fi
 	CURRENT_SEARCH=`cat /etc/resolv.conf  | grep ^search | head -n 1 | awk '{print $2}'`
 	CC=$(whiptail --backtitle "$TITLE" --inputbox "Search Domain" 0 20 "$CURRENT_SEARCH" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
 	if [ ! -z $CC ]; then
-		config="$config\n	dns-search $CC"
+		config="$config
+	dns-search $CC"
 	fi
 	start=`grep -n "iface $1" /etc/network/interfaces | cut -d ":" -f1`
 	if [ ! -z $start ]; then
@@ -101,18 +106,16 @@ A valid Netmask looks something like 255.255.255.0"
 				break
 			fi
 		done
-		if [ ! -z $end ]; then
-			del="${start},${end}d"
-			sed -i ${del// /} /etc/network/interfaces
-			sed -i "/auto $1/a\ iface $1 inet static\n$config" /etc/network/interfaces
-		fi
+		del="${start},${end}d"
+		sed -i ${del// /} /etc/network/interfaces
+		sed -i "/^auto $1/a\iface $1 inet static \\$config\n" /etc/network/interfaces
 	else
 		echo "iface $1 inet static\n$config" >> /etc/network/interfaces
 	fi
         # restarting network
         echo -e "\033[1;36mRestarting network\033[0;0m"
         sleep 3
-	ifdown $1 && ifup $1
+#	ifdown $1 && ifup $1
         sleep 3
         return 0
 }
