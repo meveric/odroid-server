@@ -33,9 +33,12 @@ set_dhcp()
 		done
 		if [ ! -z $end ]; then
 			del="${start},${end}d"
-			sed -i ${del// /} /etc/network/interfaces
-			sed -i "/auto $1/a\iface $1 inet dhcp\n" /etc/network/interfaces
+		else
+			# if no second iface is found, delete till end of file to prevent having static configuration
+			del="${start},$(($start+10))d"
 		fi
+		sed -i ${del// /} /etc/network/interfaces
+		sed -i "/auto $1/a\iface $1 inet dhcp\n" /etc/network/interfaces
 	else
 		echo "iface $1 inet dhcp" >> /etc/network/interfaces	
 	fi
@@ -106,7 +109,12 @@ A valid Netmask looks something like 255.255.255.0"
 				break
 			fi
 		done
-		del="${start},${end}d"
+		if [ ! -z $end ]; then
+			del="${start},${end}d"
+		else
+			# if no second iface is found, delete till end of file to prevent having static configuration
+			del="${start},$(($start+10))d"
+		fi
 		sed -i ${del// /} /etc/network/interfaces
 		sed -i "/^auto $1/a\iface $1 inet static \\$config\n" /etc/network/interfaces
 	else
@@ -115,7 +123,7 @@ A valid Netmask looks something like 255.255.255.0"
         # restarting network
         echo -e "\033[1;36mRestarting network\033[0;0m"
         sleep 3
-#	ifdown $1 && ifup $1
+	ifdown $1 && ifup $1
         sleep 3
         return 0
 }
