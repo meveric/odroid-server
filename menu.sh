@@ -6,7 +6,7 @@ do
 	fi
 	TITLE="ODROID Server Setup $RESTART"
 	CC=$(whiptail --backtitle "$TITLE" --menu "Main Menu" 0 0 1 --cancel-button "Exit" --ok-button "Select" \
-		" 1" "Set/Change local IP address (eth0 only)" \
+		" 1" "Set/Change local IP address (ethernet adapters only)" \
 		" 2" "Change Hostname" \
 		" 3" "resize partition to full size" \
                 " 4" "Install and configure DHCP-Server (eth0 only)" \
