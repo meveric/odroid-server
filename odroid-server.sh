@@ -25,17 +25,22 @@ check_root()
 }
 prerequirements() 
 {
-	echo -e "\033[1;36mWe wanna make sure necessary packages are installed\033[0;0m"
-	sleep 5
-	#only check for updates once a day not every single time
-	LAST_UPDATE=`stat -c %Y /var/cache/apt/pkgcache.bin`
-	DATE=`date +%s`
-	UPDATE_AGE=$(($DATE-$LAST_UPDATE))
-	if [ $UPDATE_AGE -gt $((60*60*24)) ]; then
-		apt-get update
+	# check if something is missing
+	[ -f /bin/whiptail ] || requires="whiptail"
+	[ -f /usr/bin/git ]  || requires="$requires git"
+	if [ ! -z $requires ]; then
+		echo -e "\033[1;36mWe wanna make sure necessary packages are installed\033[0;0m"
+		sleep 5
+		#only check for updates once a day not every single time
+		LAST_UPDATE=`stat -c %Y /var/cache/apt/pkgcache.bin`
+		DATE=`date +%s`
+		UPDATE_AGE=$(($DATE-$LAST_UPDATE))
+		if [ $UPDATE_AGE -gt $((60*60*24)) ]; then
+			apt-get update
+		fi
+		# in case someone removed these
+		apt-get -y install $requires
 	fi
-	# in case someone removed these
-        apt-get -y install git whiptail
 }
 
 update_scripts() 

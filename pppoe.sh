@@ -1,5 +1,4 @@
 #!/bin/bash
-TITLE="PPPoE installation and configuration"
 
 intro()
 {
