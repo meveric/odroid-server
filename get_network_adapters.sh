@@ -6,10 +6,10 @@ if [ $num_devices -gt 1 ]; then
 	menu=""
 	while [ $i -lt $num_devices ]
 	do
-		if [ $menu == "" ]; then
+		if [ "x$menu" == "x" ]; then
 			menu="$i eth$i"
 		else
-			menu="$menu\ $i eth$i"
+			menu="$menu $i eth$i"
 		fi
 		i=$(($i+1))
 	done
