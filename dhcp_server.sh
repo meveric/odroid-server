@@ -61,7 +61,7 @@ configure_dhcp_server()
 This includes options like what's the router for each client, what's the DNS server, what's the IP range for your clients."
 	msgbox "Please enter the first IP of your subnet for your DHCP server.
 For example 192.168.0.0 the DHCP server does not have to be part of that subnet."
-	CURRENT_IP=`ifconfig | grep -n1 eth0 | grep "inet addr:" | cut -d ":" -f2 | cut -d " " -f1`
+	CURRENT_IP=`ifconfig | grep -n1 $adapter | grep "inet addr:" | cut -d ":" -f2 | cut -d " " -f1`
 	NETWORK_ADDRESS="`echo $CURRENT_IP | cut -d '.' -f1`.`echo $CURRENT_IP | cut -d '.' -f2`.`echo $CURRENT_IP | cut -d '.' -f3`.0"
 	SUBNET=$(whiptail --backtitle "$TITLE" --title "Subnet Network IP Address" --inputbox "IP-Address" 0 20 "$NETWORK_ADDRESS" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
 	msgbox "Please enter a netmask for your subnet.
@@ -72,7 +72,7 @@ A good choise for example is 255.255.255.0"
 		. $HOMEDIR/dhcp_server.sh
 		return 0
 	fi
-	CURRENT_NETMASK=`ifconfig | grep -n1 eth0 | grep "Mask:" | cut -d ":" -f4`
+	CURRENT_NETMASK=`ifconfig | grep -n1 $adapter | grep "Mask:" | cut -d ":" -f4`
 	NETMASK=$(whiptail --backtitle "$TITLE" --title "Subnetmask" --inputbox "Netmask" 0 20 "$CURRENT_NETMASK" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
 	msgbox "Please enter the gateway IP-Address.
 A gateway (or router) is used to connect to different networks (for example to get from the local network to the internet)
@@ -99,7 +99,7 @@ In order to not have to write the entire name you can define a search domain cal
 The IP-Range defines in what range the DHCP server should distribute IP-Addresses to the clients.
 For example: 192.168.0.100 192.168.0.200 (to disribute IPs from 192.168.0.100 to 192.168.0.199 -> 100 IP-Addresses for clients
 Please make sure not to use more then fit in your subnet."
-	CURRENT_IP=`ifconfig | grep -n1 eth0 | grep "inet addr:" | cut -d ":" -f2 | cut -d " " -f1`
+	CURRENT_IP=`ifconfig | grep -n1 $adapter | grep "inet addr:" | cut -d ":" -f2 | cut -d " " -f1`
 	IPRANGE="`echo $CURRENT_IP | cut -d '.' -f1`.`echo $CURRENT_IP | cut -d '.' -f2`.`echo $CURRENT_IP | cut -d '.' -f3`.100 `echo $CURRENT_IP | cut -d '.' -f1`.`echo $CURRENT_IP | cut -d '.' -f2`.`echo $CURRENT_IP | cut -d '.' -f3`.199"
 	DHCP_RANGE=$(whiptail --backtitle "$TITLE" --title "Subnet IP-Range" --inputbox "IP-Range" 0 40 "$IPRANGE" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
 	if [ -z $DHCP_RANGE ]; then
@@ -123,8 +123,8 @@ Please make sure not to use more then fit in your subnet."
 	echo "}" >> /etc/dhcp/conf.d/cofig.$NUM_CONFIG
 	# add new config file in dhcpd.conf
 	echo "include \"/etc/dhcp/conf.d/cofig.$NUM_CONFIG\";" >> /etc/dhcp/dhcpd.conf
-	# make sure dhcp runs on eth0
-	sed -i "s/^INTERFACES.*/INTERFACED=\"eth0\"/" /etc/default/isc-dhcp-server
+	# make sure dhcp runs on $adapter
+	sed -i "s/^INTERFACES.*/INTERFACED=\"$adapter\"/" /etc/default/isc-dhcp-server
 	# restart dhcp server
 	service isc-dhcp-server restart
 	if [ $? -ne 0 ]; then
