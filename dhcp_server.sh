@@ -1,14 +1,30 @@
 #!/bin/bash
 
+intro()
+{
+	msgbox "With a DHCP Server your server can distribute IP addresses dynamically to clients in the network and distribut informations such as Router and DNS server for all client."
+	CC=$(whiptail --backtitle "$TITLE" --yesno "Do you want to install and configure a DHCP Server now?" 0 0 3>&1 1>&2 2>&3)
+	if [ $? -eq 0 ]; then
+		check_network_adapters
+	fi
+}
+
+
+check_network_adapters()
+{
+	adapter=`. $HOMEDIR/get_network_adapters.sh`
+	check_dhcp $adapter
+}
+
 # check if we get our IP over DHCP
 check_dhcp()
 {
-	if [ `cat /etc/network/interfaces | grep "iface eth0" | grep dhcp | wc -l` -ge 1 ]; then
+	if [ `cat /etc/network/interfaces | grep "iface $1" | grep dhcp | wc -l` -ge 1 ]; then
 		# dhcp is still active but we need a static IP address in order to do activate DHCP server
 		CC=$(whiptail --backtitle "$TITLE" --yesno "You don't have a static IP address, but we need this to setup the DHCP server.
 Do you want to setup a static IP address now?" 0 0 3>&1 1>&2 2>&3)
 		if [ $? -eq 0 ]; then
-			. $HOMEDIR/change_ip.sh static
+			. $HOMEDIR/change_ip.sh static $1
 		else
 			msgbox "DHCP Server can't be configured without a static IP address.
 Also you should deactivate other DHCP servers (such as other routers) on the same network in order to avoid conflicts between the different DHCP servers."

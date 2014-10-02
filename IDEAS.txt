@@ -1,4 +1,4 @@
 resize partition
 lvm ?
 openvpn
-pppoe
+pppoe - activating router possibilities via shorewall?
