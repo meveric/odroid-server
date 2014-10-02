@@ -118,7 +118,9 @@ A valid Netmask looks something like 255.255.255.0"
 		sed -i ${del// /} /etc/network/interfaces
 		sed -i "/^auto $1/a\iface $1 inet static \\$config\n" /etc/network/interfaces
 	else
-		echo "iface $1 inet static\n$config" >> /etc/network/interfaces
+		# remove \ in config parameters
+		config=`echo $config | sed "s/\\//"`
+		echo "iface $1 inet static$config" >> /etc/network/interfaces
 	fi
         # restarting network
         echo -e "\033[1;36mRestarting network\033[0;0m"
