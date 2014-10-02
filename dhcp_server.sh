@@ -110,19 +110,19 @@ Please make sure not to use more then fit in your subnet."
 	
 	# writing new config file
 	echo "subnet $SUBNET netmask $NETMASK {
-	range $DHCP_RANGE;" > /etc/dhcp/conf.d/cofig.$NUM_CONFIG
+	range $DHCP_RANGE;" > /etc/dhcp/conf.d/config.$NUM_CONFIG
 	if [ ! -z $GATEWAY ]; then
-		echo "	option routers $GATEWAY;" >> /etc/dhcp/conf.d/cofig.$NUM_CONFIG
+		echo "	option routers $GATEWAY;" >> /etc/dhcp/conf.d/config.$NUM_CONFIG
 	fi
 	if [ ! -z $DNS ]; then
-		echo "	option domain-name-servers $DNS;" >> /etc/dhcp/conf.d/cofig.$NUM_CONFIG
+		echo "	option domain-name-servers $DNS;" >> /etc/dhcp/conf.d/config.$NUM_CONFIG
 	fi
 	if [ ! -z $DOMAIN ]; then
-		echo "	option domain-name \"$DOMAIN\";" >> /etc/dhcp/conf.d/cofig.$NUM_CONFIG
+		echo "	option domain-name \"$DOMAIN\";" >> /etc/dhcp/conf.d/config.$NUM_CONFIG
 	fi
-	echo "}" >> /etc/dhcp/conf.d/cofig.$NUM_CONFIG
+	echo "}" >> /etc/dhcp/conf.d/config.$NUM_CONFIG
 	# add new config file in dhcpd.conf
-	echo "include \"/etc/dhcp/conf.d/cofig.$NUM_CONFIG\";" >> /etc/dhcp/dhcpd.conf
+	echo "include \"/etc/dhcp/conf.d/config.$NUM_CONFIG\";" >> /etc/dhcp/dhcpd.conf
 	# make sure dhcp runs on $adapter
 	sed -i "s/^INTERFACES.*/INTERFACED=\"$adapter\"/" /etc/default/isc-dhcp-server
 	# restart dhcp server
@@ -130,7 +130,7 @@ Please make sure not to use more then fit in your subnet."
 	if [ $? -ne 0 ]; then
 		msgbox "An error occurred while restarting the DHCP server (probably cause of some misconfiguration)
 please check server logs /var/log/syslog for more information and try to fix the issues.
-The correspondig config file can be found in: /etc/dhcp/conf.d/cofig.$NUM_CONFIG"
+The correspondig config file can be found in: /etc/dhcp/conf.d/config.$NUM_CONFIG"
 	fi
 }
 
