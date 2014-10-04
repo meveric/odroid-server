@@ -1,15 +1,30 @@
 #!/bin/bash
 # DNS-Server (Bind) installation and configuration
 
+intro()
+{
+	msgbox "With a DNS Server your server can resolve names to certain IP addresses and vice versa. It can be used to register all your clients in the Network under their name and make them them known to each other under their names rather then their IP address."
+	CC=$(whiptail --backtitle "$TITLE" --yesno "Do you want to install and configure a DNS Server now?" 0 0 3>&1 1>&2 2>&3)
+	if [ $? -eq 0 ]; then
+		check_network_adapters
+	fi
+}
+
+check_network_adapters()
+{
+	adapter=`. $HOMEDIR/get_network_adapters.sh`
+	check_dhcp
+}
+
 # check if we run on DHCP or static IP
 check_dhcp()
 {
-	if [ `cat /etc/network/interfaces | grep "iface eth0" | grep dhcp | wc -l` -ge 1 ]; then
+	if [ `cat /etc/network/interfaces | grep "iface $adapter" | grep dhcp | wc -l` -ge 1 ]; then
 		# dhcp is still active but we need a static IP address in order to do activate DHCP server
 		CC=$(whiptail --backtitle "$TITLE" --yesno "You don't have a static IP address, but we need this to setup the DNS server.
 Do you want to setup a static IP address now?" 0 0 3>&1 1>&2 2>&3)
 		if [ $? -eq 0 ]; then
-			. $HOMEDIR/change_ip.sh static
+			. $HOMEDIR/change_ip.sh static $adapter
 		else
 			msgbox "DNS Server can't be configured without a static IP address."
 			return 0
@@ -90,7 +105,7 @@ Do you want to activate a DNS-forwarder?" 0 0 3>&1 1>&2 2>&3)
 			return 0
 		fi
 		# TODO make sure it does not yet exist?
-		CURRENT_IP=`ifconfig | grep -n1 eth0 | grep "inet addr:" | cut -d ":" -f2 | cut -d " " -f1`
+		CURRENT_IP=`ifconfig | grep -n1 $adapter | grep "inet addr:" | cut -d ":" -f2 | cut -d " " -f1`
 		echo "\$TTL    86400
 $NAMEZONE.       IN      SOA     $HOSTNAME.$NAMEZONE. root.$HOSTNAME.$NAMEZONE. (
                               1         ; Serial
@@ -113,7 +128,7 @@ $HOSTNAME	IN	A	$CURRENT_IP" > /etc/bind/conf.d/db.$NAMEZONE
 		CC=$(whiptail --backtitle "$TITLE" --yesno "Do you want to create a reverse lookup for the ZONE $NAMEZONE?" 0 0 3>&1 1>&2 2>&3)
 		if [ $? -eq 0 ]; then
 			# check for netmask
-			CURRENT_NETMASK=`ifconfig | grep -n1 eth0 | grep "Mask:" | cut -d ":" -f4`
+			CURRENT_NETMASK=`ifconfig | grep -n1 $adapter | grep "Mask:" | cut -d ":" -f4`
 			# TODO calculate network to corresponding netmask and IP-Address
 			INARPA="`echo $CURRENT_IP | cut -d '.' -f3`.`echo $CURRENT_IP | cut -d '.' -f2`.`echo $CURRENT_IP | cut -d '.' -f1`.in-addr.arpa"
 			PTR="`echo $CURRENT_IP | cut -d '.' -f4`"
@@ -146,4 +161,4 @@ $PTR	IN	PTR	$HOSTNAME.$NAMEZONE." > /etc/bind/conf.d/db.$INARPA
 	fi
 }
 
-check_dhcp
+intro
