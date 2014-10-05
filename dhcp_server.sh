@@ -19,7 +19,8 @@ check_network_adapters()
 # check if we get our IP over DHCP
 check_dhcp()
 {
-	if [ `cat /etc/network/interfaces | grep "iface $adapter" | grep dhcp | wc -l` -ge 1 ]; then
+	# check if adater is set on static IP needed for DHCP Server
+	if [ `cat /etc/network/interfaces | grep "iface $adapter" | grep dhcp | wc -l` -ge 1 ] || [ `cat /etc/network/interfaces | grep "iface $adapter"` ]; then
 		# dhcp is still active but we need a static IP address in order to do activate DHCP server
 		CC=$(whiptail --backtitle "$TITLE" --yesno "You don't have a static IP address, but we need this to setup the DHCP server.
 Do you want to setup a static IP address now?" 0 0 3>&1 1>&2 2>&3)
