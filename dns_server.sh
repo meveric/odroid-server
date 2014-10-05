@@ -160,6 +160,8 @@ $PTR	IN	PTR	$HOSTNAME.$NAMEZONE." > /etc/bind/conf.d/db.$INARPA
 		fi
 		# TODO dynamic DNS over DHCP?
 	fi
+	# restart DNS Server to load new settings
+	service bind9 restart
 }
 
 intro

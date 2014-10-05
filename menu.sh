@@ -10,7 +10,9 @@ do
 		" 2" "Change Hostname" \
 		" 3" "resize partition to full size" \
                 " 4" "Install and configure DHCP-Server (one ethernet adapter only)" \
+		" 4.1" "        Advanced DHCP Configuration" \
                 " 5" "Install and configure DNS-Server (Bind) - (basic functions only)" \
+		" 5.1" "        Advanced DNS Configuration" \
                 " 6" "Install and configure OwnCloud Server - (NOT INCLUDED YET)" \
 		" 7" "Install and configure Samba 4 Active Directory Domain - (NOT INCLUDED YET)" \
 		" 8" "Install and configure Samba Server (Windows File Sharing) - (NOT INCLUDED YET)" \
@@ -35,7 +37,9 @@ Do you want to reboot now?" 0 0 3>&1 1>&2 2>&3)
 		" 2") . $HOMEDIR/change_hostname.sh ;;
 		" 3") . $HOMEDIR/fs_resize.sh ;;
 		" 4") . $HOMEDIR/dhcp_server.sh ;;
+		" 4.1") . $HOMEDIR/advanced_dhcp.sh ;;
 		" 5") . $HOMEDIR/dns_server.sh ;;
+		" 5.1") . $HOMEDIR/advanced_dns.sh ;;
 		" 6") . $HOMEDIR/owncloud_server.sh ;;
 		" 7") . $HOMEDIR/ad_server.sh ;;
 		" 8") . $HOMEDIR/samba_server.sh ;;
