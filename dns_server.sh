@@ -58,7 +58,9 @@ configure_dns_server()
 	# TODO check if forwarder is already configured
 	if [ `cat /etc/bind/named.conf.options | grep forwarders | grep -v // | wc -l` -ge 1 ]; then
 		# do crazy stuff with it
-		continue
+		# TODO backup old forwarder and incorporate in new config file if not yet exist
+		msgbox "You already have preconfigured bind server, which is not supported right now."
+		return 0
 	fi
 	# let's start with some easy options
 	CC=$(whiptail --backtitle "$TITLE" --yesno "You can use a router or other DNS Server as a forwarder to redirect unknown IP-Addresses to that server.
@@ -70,13 +72,18 @@ Do you want to activate a DNS-forwarder?" 0 0 3>&1 1>&2 2>&3)
 			chmod 755 /etc/bind/conf.d
 		fi
 		CURRENT_DNS=`cat /etc/resolv.conf  | grep ^nameserver | head -n 1 | awk '{print $2}'`		
-		FORWARDER=$(whiptail --backtitle "$TITLE" --title "DNS-Forwareder" --inputbox "IP-Address" 0 20 "$CURRENT_DNS" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
-		if [ ! -z $FORWARDER ]; then
-			echo "options {
+		FORWARDER=$(whiptail --backtitle "$TITLE" --title "DNS-Forwareder" --inputbox "IP-Address for DNS forwarding" 0 20 "$CURRENT_DNS" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
+		if [ ! -f /etc/bind/conf.d/named.conf.options ]; then
+			if [ ! -z $FORWARDER ]; then
+				echo "options {
 	forwarders {
 		$FORWARDER;
 	};
 };" > /etc/bind/conf.d/named.conf.options
+		else
+			# TODO check if forwarder already exist or should be added, or replace old
+			continue
+		fi
 		# deactivating old options
 		sed -i "s/^include \"\/etc\/bind\/named.conf.options\";/\/\/ include \"\/etc\/bind\/named.conf.options\";/" "/etc/bind/named.conf" "/etc/bind/named.conf"
 			if [ `cat /etc/bind/named.conf | grep /etc/bind/conf.d/named.conf.options | wc -l` -lt 1 ]; then
@@ -84,7 +91,7 @@ Do you want to activate a DNS-forwarder?" 0 0 3>&1 1>&2 2>&3)
 			fi
 		fi
 	fi
-	# TODO check for existing namezones?
+	# TODO check for existing namezones? -> call advanced configuration
 	CC=$(whiptail --backtitle "$TITLE" --yesno "Do you want to create a new namezone?" 0 0 3>&1 1>&2 2>&3)
 	if [ $? -eq 0 ]; then
 		CURRENT_SEARCH=`cat /etc/resolv.conf  | grep ^search | head -n 1 | awk '{print $2}'`
@@ -105,7 +112,7 @@ Do you want to activate a DNS-forwarder?" 0 0 3>&1 1>&2 2>&3)
 			msgbox "You already have a zone called \"$NAMEZONE\"!"
 			return 0
 		fi
-		# TODO make sure it does not yet exist?
+		# TODO make sure it does not yet exist? - should not be necessary since it was checked previous
 		CURRENT_IP=`ifconfig | grep -n1 $adapter | grep "inet addr:" | cut -d ":" -f2 | cut -d " " -f1`
 		echo "\$TTL    86400
 $NAMEZONE.       IN      SOA     $HOSTNAME.$NAMEZONE. root.$HOSTNAME.$NAMEZONE. (
