@@ -83,8 +83,11 @@ hit enter for default password" 0 20 --cancel-button "Exit" --ok-button "Select"
 		PASSWORD="Pa\$\$w0rd"
 		msgbox "No password entered - default password: \"Pa\$\$w0rd\""
 	fi
-	OPTIONS="--use-rfc2307 --domain=$DOMAIN --adminpass=$PASSWORD --dns-backend=$DNS_BACKEND --server-role=dc --option=\"interfaces=$adapter\" --option=\"bind interfaces only=yes\""
-	samba-tool domain provision $OPTIONS
+	# remove old smb.conf -> we will create backup
+	mv /etc/samba/smb.conf{,.bak}
+	samba-tool domain provision --use-rfc2307 --realm=$REALM --domain=$DOMAIN --adminpass=$PASSWORD --dns-backend=$DNS_BACKEND --server-role=dc --option="interfaces=$adapter" --option="bind interfaces only=yes" --use-ntvfs
+	ln -sf /var/lib/samba/private/krb5.conf /etc/krb5.conf
+	service samba restart
 	if [ "x$FORWARDER" = "x" ]; then
 		# TODO configure /etc/smb.conf with dns forwarder = $FORWARDER
 		continue
