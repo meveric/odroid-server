@@ -14,7 +14,7 @@ do
                 " 5" "Install and configure DNS-Server (Bind) - (basic functions only)" \
 		" 5.1" "        Advanced DNS Configuration" \
                 " 6" "Install and configure OwnCloud Server - (NOT INCLUDED YET)" \
-		" 7" "Install and configure Samba 4 Active Directory Domain - (NOT INCLUDED YET)" \
+		" 7" "Install and configure Samba 4 Active Directory Domain" \
 		" 8" "Install and configure Samba Server (Windows File Sharing) - (NOT INCLUDED YET)" \
 		" 9" "Install and configure OpenVPN (VPN Server) - (NOT INCLUDED YET)" \
 		"10" "Install and configure PPPOE (DSL Internet connection - on eth0)" \
