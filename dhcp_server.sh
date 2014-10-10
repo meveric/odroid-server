@@ -20,7 +20,7 @@ check_network_adapters()
 check_dhcp()
 {
 	# check if adater is set on static IP needed for DHCP Server
-	if [ `cat /etc/network/interfaces | grep "iface $adapter" | grep dhcp | wc -l` -ge 1 ] || [ `cat /etc/network/interfaces | grep "iface $adapter"` ]; then
+	if [ `cat /etc/network/interfaces | grep "iface $adapter" | grep dhcp | wc -l` -ge 1 ] || [ `cat /etc/network/interfaces | grep "iface $adapter"` -eq 0 ]; then
 		# dhcp is still active but we need a static IP address in order to do activate DHCP server
 		CC=$(whiptail --backtitle "$TITLE" --yesno "You don't have a static IP address, but we need this to setup the DHCP server.
 Do you want to setup a static IP address now?" 0 0 3>&1 1>&2 2>&3)
@@ -73,6 +73,28 @@ The DHCP server does not have to be part of that subnet."
 	if [ -z $SUBNET ]; then
 		msgbox "The network address is very important and a must have for a DHCP server if you are unsure on how to do it please ask in the forums."
 		. $HOMEDIR/dhcp_server.sh
+	fi
+	# check if the subnet already exists
+	for files in `find /etc/dhcp/conf.d/ -type f`
+	do
+		if [ `cat $files | grep "subnet" | grep "$SUBNET" | wc -l` -ge 1 ]; then
+			exists=$files
+		fi
+	done
+	if [ "x$exists" != "x" ]; then
+		msgbox "The subnet already exists in $files"
+		CC=$(whiptail --backtitle "$TITLE" --yesno "Do you want to reconfigure that subnet instead?" 0 0 3>&1 1>&2 2>&3)
+		if [ $? -eq 0 ]; then
+			. $HOMEDIR/advanced_dhcp.sh
+			return 0
+		else
+			CC=$(whiptail --backtitle "$TITLE" --yesno "Do you want to configure a different subnet instead?" 0 0 3>&1 1>&2 2>&3)
+			if [ $? -eq 0 ]; then
+				. $HOMEDIR/dhcp_server.sh
+				return 0
+			fi
+			return 0
+		fi
 	fi
 	msgbox "Please enter a netmask for your subnet.
 A Subnet defines what machines can see each other in that subnet and how many fit in a certain network.
