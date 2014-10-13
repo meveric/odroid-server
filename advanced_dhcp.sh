@@ -13,7 +13,7 @@ intro()
 check_configs()
 {
 	NUMCONFIGS=`ls /etc/dhcp/conf.d/ | wc -l`
-	if [ ! -d /etc/dhcp/conf.d/] || [ $NUMCONFIGS -lt 1 ]; then
+	if [ ! -d /etc/dhcp/conf.d/ ] || [ $NUMCONFIGS -lt 1 ]; then
 		msgbox "There is no subnet configured yet. Please run DHCP Server config first."
 		CC=$(whiptail --backtitle "$TITLE" --yesno "Do you want to install and configure a DHCP server now?" 0 0 3>&1 1>&2 2>&3)
 		if [ $? -eq 0 ]; then
@@ -33,21 +33,29 @@ check_network_adapters()
 
 ask_for_subnet()
 {
+	OIFS="$IFS"
+	IFS="$(printf '\n\t')"
 	for files in `find /etc/dhcp/conf.d -type f`
 	do
 		ID=`echo $files | cut -d "." -f3`
-		SUBNET=`grep "subnet" $files | cut -d "{" -f1`
-		OPTIONS="\"$ID\" \"$SUBNET\" \\
+		SUBNET=`grep "subnet" $files | cut -d "{" -f1 | sed "s/.$//"`
+		OPTIONS="$ID	$SUBNET
 $OPTIONS"
 	done
 	CC=$(whiptail --backtitle "$TITLE" --menu "Select Subnet to reconfigure" 0 0 1 --cancel-button "Exit" --ok-button "Select" \
 		$OPTIONS \
 		3>&1 1>&2 2>&3)
         if [ $? -eq 0 ]; then
-       		FILE=/etc/dhcp/conf.d/config.$CC 
+       		FILE=/etc/dhcp/conf.d/config.$CC
+		ask_for_task
 	else
 		return 0	
 	fi
+	IFS="$OIFS"
+}
+
+ask_for_task()
+{
 	
 }
 
