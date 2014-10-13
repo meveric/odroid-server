@@ -90,7 +90,13 @@ change_subnet()
 
 change_range()
 {
-	echo "WIP"
+	CURRENT_RANGE=`cat $FILE | grep range | sed 's/[^0-9\.\ ]*//g' | sed 's/^ //'`
+	DHCP_RANGE=$(whiptail --backtitle "$TITLE" --title "Subnet IP-Range" --inputbox "IP-Range" 0 40 "$CURRENT_RANGE" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
+	if [ $? -eq 0 ]; then
+		sed -i "s/range.*/range $DHCP_RANGE;/" $FILE
+		restart_server
+		ask_for_task
+	fi
 }
 
 change_router()
@@ -125,9 +131,14 @@ remove_subnet()
 		rm -f $FILE
 		DELETE=`grep -n "$FILE" "/etc/dhcp/dhcpd.conf" | cut -d ":" -f1`
 		sed -i "${DELETE}d" /etc/dhcp/dhcpd.conf
-		# TODO check if it was running previously? Ask for restart?
-		service isc-dhcp-server restart
+		restart_server
 	fi
+}
+
+restart_server()
+{
+	# TODO check if it was running previously? Ask for restart?
+	service isc-dhcp-server restart
 }
 
 intro
