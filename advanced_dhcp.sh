@@ -64,6 +64,7 @@ ask_for_task()
 		"5"	"Reconfigure Search-Domain" \
 		"6"	"Add or Reconfigure static IPs for specific device" \
 		"7"	"Configure autoregistration on DNS Server" \
+		"8"	"Remove subnet" \
 	3>&1 1>&2 2>&3)
 	if [ $? -eq 0 ]; then
 		case "$CC" in
@@ -74,6 +75,7 @@ ask_for_task()
 		"5") change_search ;;
 		"6") change_static ;;
 		"7") change_autodns ;;
+		"8") remove_subnet ;;
 		*) msgbox "Error 002. Please report on the forums" && exit 0 ;;
 		esac || msgbox "I don't know how you got here! >> $CC <<  Report on the forums"
 	else
@@ -114,6 +116,18 @@ change_static()
 change_autodns()
 {
 	echo "WIP"
+}
+
+remove_subnet()
+{
+	CC=$(whiptail --backtitle "$TITLE" --yesno "Are you sure you want to completely remove the subnet?" 0 0 3>&1 1>&2 2>&3)
+	if [ $? -eq 0 ]; then
+		rm -f $FILE
+		DELETE=`grep -n "$FILE" "/etc/dhcp/dhcpd.conf" | cut -d ":" -f1`
+		sed -i "${DELETE}d" /etc/dhcp/dhcpd.conf
+		# TODO check if it was running previously? Ask for restart?
+		service isc-dhcp-server restart
+	fi
 }
 
 intro
