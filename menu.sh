@@ -10,9 +10,9 @@ do
 		" 2" "Change Hostname" \
 		" 3" "resize partition to full size" \
                 " 4" "Install and configure DHCP-Server (one ethernet adapter only)" \
-		" 4.1" "        Advanced DHCP Configuration" \
+		" 4.1" "        Advanced DHCP Configuration (NOT INCLUDED YET - WIP)" \
                 " 5" "Install and configure DNS-Server (Bind) - (basic functions only)" \
-		" 5.1" "        Advanced DNS Configuration" \
+		" 5.1" "        Advanced DNS Configuration (NOT INCLUDED YET)" \
                 " 6" "Install and configure OwnCloud Server - (NOT INCLUDED YET)" \
 		" 7" "Install and configure Samba 4 Active Directory Domain" \
 		" 8" "Install and configure Samba Server (Windows File Sharing) - (NOT INCLUDED YET)" \
