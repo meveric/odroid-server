@@ -3,7 +3,7 @@
 # ODROID Server Setup
 
 # For debug uncomment
- set -x
+# set -x
 
 # Global defines
 HOMEDIR="/root/odroid-server"
