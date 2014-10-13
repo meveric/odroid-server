@@ -45,18 +45,75 @@ $OPTIONS"
 	CC=$(whiptail --backtitle "$TITLE" --menu "Select Subnet to reconfigure" 0 0 1 --cancel-button "Exit" --ok-button "Select" \
 		$OPTIONS \
 		3>&1 1>&2 2>&3)
+	IFS="$OIFS"
         if [ $? -eq 0 ]; then
        		FILE=/etc/dhcp/conf.d/config.$CC
 		ask_for_task
 	else
 		return 0	
 	fi
-	IFS="$OIFS"
 }
 
 ask_for_task()
 {
-	
+	CC=$(whiptail --backtitle "$TITLE" --menu "What do you want to change?" 0 0 1 --cancel-button "Exit" --ok-button "Select" \
+		"1"	"Reconfigure subnet" \
+		"2"	"Reconfigure IP-Range" \
+		"3"	"Reconfigure Default Gateway" \
+		"4"	"Reconfigure DNS Servers" \
+		"5"	"Reconfigure Search-Domain" \
+		"6"	"Add or Reconfigure static IPs for specific device" \
+		"7"	"Configure autoregistration on DNS Server" \
+	3>&1 1>&2 2>&3)
+	if [ $? -eq 0 ]; then
+		case "$CC" in
+		"1") change_subnet ;;
+		"2") change_range ;;
+		"3") change_router ;;
+		"4") change_dns ;;
+		"5") change_search ;;
+		"6") change_static ;;
+		"7") change_autodns ;;
+		*) msgbox "Error 002. Please report on the forums" && exit 0 ;;
+		esac || msgbox "I don't know how you got here! >> $CC <<  Report on the forums"
+	else
+		return 0
+	fi
+}
+
+change_subnet()
+{
+	echo "WIP"
+}
+
+change_range()
+{
+	echo "WIP"
+}
+
+change_router()
+{
+	echo "WIP"
+}
+
+change_dns()
+{
+	echo "WIP"
+}
+
+change_search()
+{
+	echo "WIP"
+}
+
+change_static()
+{
+	echo "WIP"
+}
+
+change_autodns()
+{
+	echo "WIP"
 }
 
 intro
