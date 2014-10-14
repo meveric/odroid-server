@@ -129,7 +129,16 @@ change_dns()
 
 change_search()
 {
-	echo "WIP"
+	CURRENT_SEARCH=`cat $FILE | grep "domain-name " | sed 's/option domain-name //' | sed 's/;//' | sed 's/\t//' | sed 's/"//g'`
+	DOMAIN=$(whiptail --backtitle "$TITLE" --inputbox "Search Domain" 0 20 "$CURRENT_SEARCH" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
+	if [ $? -eq 0 ]; then
+		if [ "x$CURRENT_SEARCH" != "x" ]; then
+			sed -i "s/option domain-name .*/option domain-name \"$DOMAIN\";/" $FILE
+		else
+			sed -i "/# RANGE END/a# DOMAIN START\n  option domain-name \"$DOMAIN\";\n# DOMAIN END" $FILE
+		fi
+		restart_server
+	fi
 }
 
 change_static()
