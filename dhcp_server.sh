@@ -127,7 +127,7 @@ It should look like 192.168.0.1"
 This can for example be the router, or a different DNS server if necessary.
 It should look like 192.168.0.1"
 	CURRENT_DNS=`cat /etc/resolv.conf  | grep ^nameserver | head -n 1 | awk '{print $2}'`
-	DNS=$(whiptail --backtitle "$TITLE" --inputbox "DNS Server (separate multiple DNS by space)" 0 20 "$CURRENT_DNS" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
+	DNS=$(whiptail --backtitle "$TITLE" --inputbox "DNS Server (separate multiple DNS by comma \",\")" 0 20 "$CURRENT_DNS" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
 	# if Exit then go back to menu
 	if [ $? -eq 1 ]; then
 		return 0

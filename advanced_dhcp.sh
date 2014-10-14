@@ -115,7 +115,16 @@ change_gateway()
 
 change_dns()
 {
-	echo "WIP"
+	CURRENT_DNS=`cat $FILE | grep routers | sed 's/option domain-name-servers//' | sed 's/;//' | sed 's/\t//' | sed 's/^ //'`
+	DNS=$(whiptail --backtitle "$TITLE" --inputbox "DNS Server (separate multiple DNS by comma \",\")" 0 20 "$CURRENT_DNS" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
+	if [ $? -eq 0 ]; then
+		if [ "x$CURRENT_DNS" != "x" ]; then
+			sed -i "s/option domain-name-servers.*/option domain-name-servers $DNS;/" $FILE
+		else
+			sed -i "/# RANGE END/a# DNS START\n  option domain-name-servers $DNS;\n# DNS END" $FILE
+		fi
+		restart_server
+	fi
 }
 
 change_search()
