@@ -70,7 +70,7 @@ ask_for_task()
 		case "$CC" in
 		"1") change_subnet ;;
 		"2") change_range ;;
-		"3") change_router ;;
+		"3") change_gateway ;;
 		"4") change_dns ;;
 		"5") change_search ;;
 		"6") change_static ;;
@@ -99,9 +99,18 @@ change_range()
 	fi
 }
 
-change_router()
+change_gateway()
 {
-	echo "WIP"
+	CURRENT_GATEWAY=`cat $FILE | grep routers | sed 's/option routers//' | sed 's/;//' | sed 's/\t//' | sed 's/^ //'`
+	GATEWAY=$(whiptail --backtitle "$TITLE" --title "Gateway Server" --inputbox "Gateway Server (Router-IP). Multiple Gateways can be separated by comma \",\"" 0 20 "$CURRENT_GATEWAY" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
+	if [ $? -eq 0 ]; then
+		if [ "x$CURRENT_GATEWAY" != "x" ]; then
+			sed -i "s/option routers.*/option routers $GATEWAY;/" $FILE
+		else
+			sed -i "/# RANGE END/a# ROUTER START\n	option routers $GATEWAY;\n# ROUTER END" $FILE
+		fi
+		restart_server
+	fi
 }
 
 change_dns()
@@ -137,8 +146,10 @@ remove_subnet()
 
 restart_server()
 {
-	# TODO check if it was running previously? Ask for restart?
-	service isc-dhcp-server restart
+	CC=$(whiptail --backtitle "$TITLE" --yesno "DHCP Server configuration changed, do you want to restart server now?" 0 0 3>&1 1>&2 2>&3)
+	if [ $? -eq 0 ]; then
+		service isc-dhcp-server restart
+	fi
 }
 
 intro

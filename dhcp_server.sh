@@ -118,7 +118,7 @@ It should look like 192.168.0.1"
 		return 0
 	fi
 	CURRENT_GATEWAY=`route -n  | grep ^0.0.0.0 | awk '{print $2}'`
-	GATEWAY=$(whiptail --backtitle "$TITLE" --title "Gateway Server" --inputbox "Gateway Server (Router-IP)" 0 20 "$CURRENT_GATEWAY" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
+	GATEWAY=$(whiptail --backtitle "$TITLE" --title "Gateway Server" --inputbox "Gateway Server (Router-IP). Multiple Gateways can be separated by comma \",\":" 0 20 "$CURRENT_GATEWAY" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
 	# if Exit then go back to menu
 	if [ $? -eq 1 ]; then
 		return 0
