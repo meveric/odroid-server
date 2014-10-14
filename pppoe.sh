@@ -25,8 +25,9 @@ configure_pppoe()
 	pppoeconf
 	# make sure pppoe is running on eth0
 	sed -i "s/^plugin rp-pppoe.so.*/plugin rp-pppoe.so eth0/" "/etc/ppp/peers/dsl-provider"
-	# set DNS servers
-	echo "nameserver 127.0.0.1\n nameserver 8.8.8.8"> /etc/ppp/resolv.conf
+	# should not be done here check /etc/ppp/if-up.d/
+#	# set DNS servers
+#	echo "nameserver 127.0.0.1\n nameserver 8.8.8.8"> /etc/ppp/resolv.conf
 }
 
 intro
