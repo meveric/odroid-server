@@ -115,7 +115,7 @@ change_gateway()
 
 change_dns()
 {
-	CURRENT_DNS=`cat $FILE | grep routers | sed 's/option domain-name-servers//' | sed 's/;//' | sed 's/\t//' | sed 's/^ //'`
+	CURRENT_DNS=`cat $FILE | grep domain-name-servers | sed 's/option domain-name-servers//' | sed 's/;//' | sed 's/\t//' | sed 's/^ //'`
 	DNS=$(whiptail --backtitle "$TITLE" --inputbox "DNS Server (separate multiple DNS by comma \",\")" 0 20 "$CURRENT_DNS" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
 	if [ $? -eq 0 ]; then
 		if [ "x$CURRENT_DNS" != "x" ]; then
