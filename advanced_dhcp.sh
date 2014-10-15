@@ -85,7 +85,13 @@ ask_for_task()
 
 change_subnet()
 {
-	echo "WIP"
+	CURRENT_SUBNET=`grep "subnet" $FILE | cut -d "{" -f1 | sed "s/.$//"`
+	SUBNET=$(whiptail --backtitle "$TITLE" --title "Configure Subnet (Subnet IP / Netmask)" --inputbox "Change the values as they seem fitting for you." 0 40 "$CURRENT_SUBNET" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
+	if [ $? -eq 0 ]; then
+		sed -i "s/$CURRENT_SUBNET/$SUBNET/" $FILE
+		restart_server
+		ask_for_task
+	fi
 }
 
 change_range()
@@ -110,6 +116,7 @@ change_gateway()
 			sed -i "/# RANGE END/a# ROUTER START\n	option routers $GATEWAY;\n# ROUTER END" $FILE
 		fi
 		restart_server
+		ask_for_task
 	fi
 }
 
@@ -124,6 +131,7 @@ change_dns()
 			sed -i "/# RANGE END/a# DNS START\n  option domain-name-servers $DNS;\n# DNS END" $FILE
 		fi
 		restart_server
+		ask_for_task
 	fi
 }
 
@@ -138,6 +146,7 @@ change_search()
 			sed -i "/# RANGE END/a# DOMAIN START\n  option domain-name \"$DOMAIN\";\n# DOMAIN END" $FILE
 		fi
 		restart_server
+		ask_for_task
 	fi
 }
 
@@ -159,6 +168,7 @@ remove_subnet()
 		DELETE=`grep -n "$FILE" "/etc/dhcp/dhcpd.conf" | cut -d ":" -f1`
 		sed -i "${DELETE}d" /etc/dhcp/dhcpd.conf
 		restart_server
+		ask_for_task
 	fi
 }
 
