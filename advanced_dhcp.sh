@@ -165,7 +165,7 @@ change_static()
 
 add_static()
 {
-	MAC=$(whiptail --backtitle "$TITLE" --inputbox "MAC-Address for system with static IP:" 0 20 "" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
+	MAC=$(whiptail --backtitle "$TITLE" --inputbox "MAC-Address for system with static IP (format aa:bb:cc:dd:ee:ff):" 0 20 "" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
 	if [ $? -eq 0 ] && [ "x$MAC" != "x" ]; then
 		IP=$(whiptail --backtitle "$TITLE" --inputbox "Static IP for new device:" 0 20 "" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
 		if [ $? -eq 0 ] && [ "x$IP" != "x" ]; then
@@ -185,11 +185,12 @@ add_static()
 	if [ $? -eq 0 ]; then
 		add_static
 	else
+		restart_server
 		ask_for_task
 	fi
 }
 
-remove_static()
+get_static()
 {
 	OPTIONS=""
 	NUM_DEVICES=`grep "^host" $FILE | wc -l`
@@ -201,35 +202,79 @@ remove_static()
 			OPTIONS="$DEVICE	$(($NUM_DEVICES-$i))
 $OPTIONS"
 			i=$(($i+1))
-        	done
-	
-		CC=$(whiptail --backtitle "$TITLE" --menu "Select Device to remove:" 0 0 1 --cancel-button "Exit" --ok-button "Select" \
-			$OPTIONS \
-		3>&1 1>&2 2>&3)
-        	if [ $? -eq 0 ]; then
-			START=`grep -n "^# HOST $CC START" $FILE | cut -d ":" -f1`
-			END=`grep -n "^# HOST $CC END" $FILE | cut -d ":" -f1`
-			sed -i "${START},${END}d" $FILE
-			
-                	CC=$(whiptail --backtitle "$TITLE" --yesno "Do you want to remove another device?" 0 0 3>&1 1>&2 2>&3)
-			if [ $? -eq 0 ]; then
-				remove_static
-			else
-				ask_for_task
-			fi
-        	else
-                	ask_for_task
-        	fi
+		done
 	else
 		msgbox "No devices with static IPs found in this subnet"
 		ask_for_task
-	fi
+        fi	
+}
+
+remove_static()
+{
+	get_static
+	CC=$(whiptail --backtitle "$TITLE" --menu "Select Device to remove:" 0 0 1 --cancel-button "Exit" --ok-button "Select" \
+		$OPTIONS \
+	3>&1 1>&2 2>&3)
+        if [ $? -eq 0 ]; then
+		START=`grep -n "^# HOST $CC START" $FILE | cut -d ":" -f1`
+		END=`grep -n "^# HOST $CC END" $FILE | cut -d ":" -f1`
+		sed -i "${START},${END}d" $FILE
+		
+               	CC=$(whiptail --backtitle "$TITLE" --yesno "Do you want to remove another device?" 0 0 3>&1 1>&2 2>&3)
+		if [ $? -eq 0 ]; then
+			remove_static
+		else
+			restart_server
+			ask_for_task
+		fi
+        else
+              	ask_for_task
+        fi
 }
 
 modify_static()
 {
-	echp "WIP"
+	get_static
+	DEVICE=$(whiptail --backtitle "$TITLE" --menu "Select Device to modify:" 0 0 1 --cancel-button "Exit" --ok-button "Select" \
+		$OPTIONS \
+	3>&1 1>&2 2>&3)
+	if [ $? -eq 0 ]; then
+		# TODO menu for options here
+		CC=$(whiptail --backtitle "$TITLE" --menu "What do you want to modify?" 0 0 1 --cancel-button "Exit" --ok-button "Select" \
+			"1"	"Change name/identifyer" \
+			"2"	"Change MAC address" \
+			"3"	"Change IP address" \
+		3>&1 1>&2 2>&3)
+		if [ $? -eq 0 ]; then
+			case "$CC" in
+			"1") change_name_static ;;
+			"2") change_mac_static ;;
+			"3") change_ip_static ;;
+			*) msgbox "Error 004. Please report on the forums" && exit 0 ;;
+			esac || msgbox "I don't know how you got here! >> $CC <<  Report on the forums"
+		else
+			ask_for_task
+		fi
+	else
+		ask_for_task
+	fi
 }
+
+change_name_static()
+{
+	echo "WIP"
+}
+
+change_mac_static()
+{
+	echo "WIP"
+}
+
+change_ip_static()
+{
+	echo "WIP"
+}
+
 change_autodns()
 {
 	echo "WIP"
