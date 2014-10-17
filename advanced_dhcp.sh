@@ -234,12 +234,12 @@ remove_static()
 
 modify_static()
 {
+	# TODO put restart somewhere
 	get_static
 	DEVICE=$(whiptail --backtitle "$TITLE" --menu "Select Device to modify:" 0 0 1 --cancel-button "Exit" --ok-button "Select" \
 		$OPTIONS \
 	3>&1 1>&2 2>&3)
 	if [ $? -eq 0 ]; then
-		# TODO menu for options here
 		CC=$(whiptail --backtitle "$TITLE" --menu "What do you want to modify?" 0 0 1 --cancel-button "Exit" --ok-button "Select" \
 			"1"	"Change name/identifyer" \
 			"2"	"Change MAC address" \
@@ -252,6 +252,10 @@ modify_static()
 			"3") change_ip_static ;;
 			*) msgbox "Error 004. Please report on the forums" && exit 0 ;;
 			esac || msgbox "I don't know how you got here! >> $CC <<  Report on the forums"
+			CC=$(whiptail --backtitle "$TITLE" --yesno "Do you want to modify another device?" 0 0 3>&1 1>&2 2>&3)
+			if [ $? -eq 0 ]; then
+				modify_static
+			fi
 		else
 			ask_for_task
 		fi
@@ -262,17 +266,36 @@ modify_static()
 
 change_name_static()
 {
-	echo "WIP"
+	NAME=$(whiptail --backtitle "$TITLE" --inputbox "New hostname of the device (will be used as an identifier):" 0 40 "$DEVICE" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
+	if [ $? -eq 0 ] && [ "x$NAME" != "x" ]; then
+		sed -i "s/^# HOST $DEVICE START/# HOST $NAME START/" $FILE
+		sed -i "s/^# HOST $DEVICE END/# HOST $NAME END/" $FILE
+		sed -i "s/^host $DEVICE {/host $NAME {/" $FILE
+	else
+		msgbox "Nothing will be changed."
+	fi
 }
 
 change_mac_static()
 {
-	echo "WIP"
+	OLD_MAC=`grep -a3 "^# HOST $DEVICE START" $FILE | grep "hardware ethernet" | sed "s/hardware ethernet//" | sed "s/\t//g" | sed "s/ //g" | sed "s/;//"`
+	MAC=$(whiptail --backtitle "$TITLE" --inputbox "New MAC-Address for system with static IP (format aa:bb:cc:dd:ee:ff):" 0 20 "$OLD_MAC" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
+	if [ $? -eq 0 ] && [ "x$MAC" != "x" ]; then
+		sed -i "s/hardware ethernet $OLD_MAC/hardware ethernet $MAC/" $FILE
+	else
+		msgbox "Nothing will be changed."
+	fi
 }
 
 change_ip_static()
 {
-	echo "WIP"
+	OLD_IP=`grep -a3 "^# HOST $DEVICE START" $FILE | grep "fixed-address" | sed "s/fixed-address//" | sed "s/\t//g" | sed "s/ //g" | sed "s/;//"`
+	IP=$(whiptail --backtitle "$TITLE" --inputbox "New static IP for new device:" 0 20 "$OLD_IP" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
+	if [ $? -eq 0 ] && [ "x$IP" != "x" ]; then
+		sed -i "s/fixed-address $OLD_IP/fixed-address $IP/" $FILE
+	else
+		msgbox "Nothing will be changed."
+	fi
 }
 
 change_autodns()
