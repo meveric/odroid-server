@@ -57,7 +57,7 @@ ask_for_task()
 		"4"	"Reconfigure DNS Servers" \
 		"5"	"Reconfigure Search-Domain" \
 		"6"	"Configure devices with static IPs" \
-		"7"	"Configure autoregistration on DNS Server" \
+		"7"	"Configure autoregistration on DNS Server (Bind9 only)" \
 		"8"	"Remove subnet" \
 	3>&1 1>&2 2>&3)
 	if [ $? -eq 0 ]; then
@@ -300,7 +300,75 @@ change_ip_static()
 
 change_autodns()
 {
+	# get all available DNS zones (bind9 only)
+	# sanity check if bind9 is even installed
+	if [ -f /usr/sbin/named ]; then
+		CC=$(whiptail --backtitle "$TITLE" --menu "What do you want to modify?" 0 0 1 --cancel-button "Exit" --ok-button "Select" \
+			"1"	"Activated automatic dns registrytion for a special DNS-Zone" \
+			"2"	"Deactivate automatic dns registrytion for a special DNS-Zone" \
+		3>&1 1>&2 2>&3)
+		if [ $? -eq 0 ]; then
+			case "$CC" in
+			"1") enable_autodns ;;
+			"2") disable_autodns ;;
+			*) msgbox "Error 005. Please report on the forums" && exit 0 ;;
+			esac || msgbox "I don't know how you got here! >> $CC <<  Report on the forums"
+		fi
+	else
+		disable_autodns
+	fi
+}
+
+enable_autodns()
+{
+	msgbox "Please Select the DNS-ZONE you want to add to $SUBNET"
+	select_dnszone
+	# try to find DNS zone in subnet
+	if [ `grep $DNSZONE $FILE | wc -l` -ge 1 ]; then
+		msg "The ZONE is already activated"
+		CC=$(whiptail --backtitle "$TITLE" --yesno "Do you want to activate another zone?" 0 0 3>&1 1>&2 2>&3)
+		if [ $? -eq 0 ]; then
+			enable_autodns
+		else
+			ask_for_task
+		fi
+	else
+		ENTRY="zone `echo $DNSZONE | sed "s/^db.//"`. { \\
+	primary 127.0.0.1; \\
+	key \"rndc-key\" \\
+}"
+		sed -i "/# RANGE END/a# ZONE `echo $DNSZONE | sed "s/^db.//"` START\n$ENTRY\n# ZONE `echo $DNSZONE | sed "s/^db.//"` END" $FILE
+	fi
 	echo "WIP"
+}
+
+disable_autodns()
+{
+	echo "WIP"
+}
+
+select_dnszone()
+{
+	OPTIONS=""
+	OIFS="$IFS"
+	IFS="$(printf '\n\t')"
+	NUM_FILES=`find /etc/bind/conf.d -type f -name "db.*" | wc -l`
+	i=0
+	for files in `find /etc/bind/conf.d -type f -name "db.*"`
+	do
+		OPTIONS="`basename $files`	$(($NUM_FILES-$i))
+$OPTIONS"
+		i=$(($i+1))
+	done
+	DNSZONE=$(whiptail --backtitle "$TITLE" --menu "Select Subnet to reconfigure" 0 0 1 --cancel-button "Exit" --ok-button "Select" \
+		$OPTIONS \
+		3>&1 1>&2 2>&3)
+	if [ $? -eq 1 ]; then
+		IFS="$OIFS"
+		msgbox "Aborting as requested"
+		return 0
+	fi
+	IFS="$OIFS"
 }
 
 remove_subnet()
