@@ -171,6 +171,7 @@ add_static()
 		if [ $? -eq 0 ] && [ "x$IP" != "x" ]; then
 			NAME=$(whiptail --backtitle "$TITLE" --inputbox "Hostname of the device (will be used as an identifier):" 0 40 "" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
 			if [ $? -eq 0 ] && [ "x$NAME" != "x" ]; then
+				# TODO add hostname in configuration?
 				sed -i "/# RANGE END/a# HOST $NAME START\nhost $NAME {\n	hardware ethernet $MAC;\n	fixed-address $IP;\n}\n# HOST $NAME END" $FILE
 			else
 				ask_for_task
@@ -321,6 +322,12 @@ change_autodns()
 
 enable_autodns()
 {
+	# make sure DHCP is configured to allow autodns
+	sed -i "s/ddns-update-style.*/ddns-update-style interim;/" /etc/dhcp/dhcpd.conf
+	sed -i "s/^#authoritative;/authoritative;/" /etc/dhcp/dhcpd.conf
+	if [ `grep "include \"/etc/bind/rndc.key\"" /etc/dhcp/dhcpd.conf | wc -l` -lt 1 ]; then
+		echo "include \"/etc/bind/rndc.key\"" >> /etc/dhcp/dhcpd.conf
+	fi
 	msgbox "Please Select the DNS-ZONE you want to add to $SUBNET"
 	select_dnszone
 	# try to find DNS zone in subnet
@@ -338,13 +345,50 @@ enable_autodns()
 	key \"rndc-key\" \\
 }"
 		sed -i "/# RANGE END/a# ZONE `echo $DNSZONE | sed "s/^db.//"` START\n$ENTRY\n# ZONE `echo $DNSZONE | sed "s/^db.//"` END" $FILE
+		restart_server
 	fi
-	echo "WIP"
+	CC=$(whiptail --backtitle "$TITLE" --yesno "Do you want to activate another zone?" 0 0 3>&1 1>&2 2>&3)
+	if [ $? -eq 0 ]; then
+		enable_autodns
+	else
+		ask_for_task
+	fi
 }
 
 disable_autodns()
 {
-	echo "WIP"
+	OPTIONS=""
+	NUM_ZONES=$((`grep "^# ZONE" $FILE | wc -l`/2))
+	if [ $NUM_ZONES -ge 1 ]; then
+		i=0
+		for zones in `grep "^# ZONE" $FILE | grep "START" | sed "s/# ZONE //" | sed "s/ START//"`
+		do
+			OPTIONS="$zones	$(($NUM_ZONES-$i))
+$OPTIONS"
+			i=$(($i+1))
+		done
+		DNSZONE=$(whiptail --backtitle "$TITLE" --menu "Select DNS-Zone to remove:" 0 0 1 --cancel-button "Exit" --ok-button "Select" \
+			$OPTIONS \
+			3>&1 1>&2 2>&3)
+		if [ $? -eq 1 ]; then
+			msgbox "Aborting as requested"
+		else
+			START=`grep -n "^# ZONE $DNSZONE START" $FILE | cut -d ":" -f1`
+			END=`grep -n "^# ZONE $DNSZONE END" $FILE | cut -d ":" -f1`
+			sed -i "${START},${END}d" $FILE
+			msgbox "Automatic DNS updated for DNS-Zone \"$DNSZONE\" was removed."
+			restart_server
+			CC=$(whiptail --backtitle "$TITLE" --yesno "Do you want to remove another zone?" 0 0 3>&1 1>&2 2>&3)
+			if [ $? -eq 0 ]; then
+				disable_autodns
+			else
+				ask_for_task
+			fi
+		fi
+	else
+		msgbox "No zones configured for automatic dns updates"
+		ask_for_task
+	fi
 }
 
 select_dnszone()
@@ -360,7 +404,7 @@ select_dnszone()
 $OPTIONS"
 		i=$(($i+1))
 	done
-	DNSZONE=$(whiptail --backtitle "$TITLE" --menu "Select Subnet to reconfigure" 0 0 1 --cancel-button "Exit" --ok-button "Select" \
+	DNSZONE=$(whiptail --backtitle "$TITLE" --menu "Select DNS-Zone:" 0 0 1 --cancel-button "Exit" --ok-button "Select" \
 		$OPTIONS \
 		3>&1 1>&2 2>&3)
 	if [ $? -eq 1 ]; then
