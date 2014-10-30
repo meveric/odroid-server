@@ -13,7 +13,7 @@ ask_for_task()
 	CC=$(whiptail --backtitle "$TITLE" --menu "What do you want to change?" 0 0 1 --cancel-button "Exit" --ok-button "Select" \
 		"1"	"Reconfigure DNS-forwarder" \
 		"2"	"Reconfigure DNS-zones" \
-		"3"	"Add/Remove DNS-Entries" \
+		"3"	"Reconfigure DNS-Entries" \
 	3>&1 1>&2 2>&3)
 	if [ $? -eq 0 ]; then
 		case "$CC" in
