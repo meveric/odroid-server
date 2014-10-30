@@ -111,6 +111,9 @@ configure_openvpn()
 	sed -i "s/export KEY_EMAIL=.*/export KEY_EMAIL=\"$EMAIL\"/" /etc/openvpn/easy-rsa/vars
 	sed -i "s/export KEY_OU=.*/export KEY_OU=\"$OU\"/" /etc/openvpn/easy-rsa/vars
 
+	# TODO
+	# ask for KEY_SIZE=2048 or KEY_SIZE=4096 (higher values as 2048 might not be supported by mobile devices)
+
 	# now let's be paranoid and go to higher security
 	sed -i "s/^default_md.*/default_md		= sha512/"
 
