@@ -85,12 +85,12 @@ Do you want to activate a DNS-forwarder?" 0 0 3>&1 1>&2 2>&3)
 			# check if forwarder already exists
 			OLD_FORWARDER=`cat /etc/bind/conf.d/named.conf.options | grep -A1 forwarders | grep -v forwarders | sed "s/\t//g" | sed "s/;//"`
 			if [ "x$OLD_FORWARDER" != "x$FORWARDER" ]; then
-				CC=$(whiptail --backtitle "$TITLE" --yesno --yes-button "replace" --no-button "add" "Your current forwarder is $OLD_FORWARDER do you want to add $FORWARDER to the forwarders list, or replace your old forwarder?" 0 0 3>&1 1>&2 2>&3)
+				CC=$(whiptail --backtitle "$TITLE" --yesno "Your current forwarder is $OLD_FORWARDER do you want to replace your forwarder with $FORWARDER?" 0 0 3>&1 1>&2 2>&3)
 				# TODO check for multiple FORWARDERS
 				if [ $? -eq 0 ]; then
 					sed -i "s/$OLD_FORWARDER/$FORWARDER/" /etc/bind/conf.d/named.conf.options
 				else
-					sed -i "s/$OLD_FORWARDER/$OLD_FORWARDER; $FORWARDER/" /etc/bind/conf.d/named.conf.options
+					msgbox "keeping the old forwarder $OLD_FORWARDER."
 				fi
 			else
 				# nothing to do
