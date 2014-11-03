@@ -4,6 +4,7 @@ intro()
 	msgbox "Here you can reconfigure your DNS server or add more advanced options such as additional ZONES."
 	CC=$(whiptail --backtitle "$TITLE" --yesno "Do you want to continue?" 0 0 3>&1 1>&2 2>&3)
 	if [ $? -eq 0 ]; then
+		# TODO check if bind9 was configured previously and we really do reconfiguration
 		ask_for_task
 	fi
 }
@@ -85,7 +86,13 @@ remove_zone()
 
 add_zone()
 {
-	echo "WIP"
+	CURRENT_SEARCH=`cat /etc/resolv.conf  | grep ^search | head -n 1 | awk '{print $2}'`
+	NAMEZONE=$(whiptail --backtitle "$TITLE" --inputbox "New NameZone" 0 20 "$CURRENT_SEARCH" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
+	if [ `grep "^zone $NAMEZONE {" "/etc/bind/conf.d/named.conf.zones" | wc -l` -lt 1 ]; then
+		echo "WIP"
+	else
+		msgbox "Zone $NAMEZONE already exists."
+	fi
 }
 
 select_zone()
