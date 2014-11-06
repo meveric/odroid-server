@@ -16,7 +16,8 @@ do
                 " 6" "Install and configure OwnCloud Server - (NOT INCLUDED YET)" \
 		" 7" "Install and configure Samba 4 Active Directory Domain" \
 		" 8" "Install and configure Samba Server (Windows File Sharing) - (NOT INCLUDED YET)" \
-		" 9" "Install and configure OpenVPN (VPN Server) - (NOT INCLUDED YET)" \
+		" 9" "Install and configure OpenVPN (VPN Server)" \
+		" 9.1" "        Create Client Certificates for VPN" \
 		"10" "Install and configure PPPOE (DSL Internet connection - on eth0)" \
                 3>&1 1>&2 2>&3)
 
@@ -44,6 +45,7 @@ Do you want to reboot now?" 0 0 3>&1 1>&2 2>&3)
 		" 7") . $HOMEDIR/ad_server.sh ;;
 		" 8") . $HOMEDIR/samba_server.sh ;;
 		" 9") . $HOMEDIR/openvpn_server.sh ;;
+		" 9.1") . $HOMEDIR/openvpn_clients.sh ;;
 		"10") . $HOMEDIR/pppoe.sh ;;
 		*) msgbox "Error 001. Please report on the forums" && exit 0 ;;
 		esac || msgbox "I don't know how you got here! >> $CC <<  Report on the forums"
