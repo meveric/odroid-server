@@ -38,37 +38,21 @@ create_client_certificate()
 {
 	CLIENT_NAME=$(whiptail --backtitle "$TITLE" --title "Client Name" --inputbox "Name of the VPN client (e.g. hostname of the client)" 0 20 "pc-client-1" 3>&1 1>&2 2>&3)
 	if [ $? -eq 0 ] && [ "x$CLIENT_NAME" != "x" ]; then
+		msgbox "You've been ask to add \"extra\" attributes, please choose a secure password here to prevent other people to use your certificate without authorization"
 		./build-key $CLIENT_NAME
 	else
 		return 0
 	fi
-	# only when last command was sucessful
-	if [ $? -eq 0 ]; then
-		VPNSERVER_IP=$(whiptail --backtitle "$TITLE" --title "IP of VPN-Server" --inputbox "IP address to connect to the VPN Server (external IP address or dyndns)" 0 20 "myserver.example.com" 3>&1 1>&2 2>&3)
-		# TODO check if an IP was entered and is valid
-		if [ $? -eq 1 ]; then
-			return 0
-		fi
-		echo "client
-dev tun
-port 1194
-proto udp
-
-remote $VPNSERVER_IP 1194             # VPN server IP : PORT
-nobind
-
-ca ca.crt
-cert ${CLIENT_NAME}.crt
-key ${CLIENT_NAME}.key
-
-comp-lzo
-persist-key
-persist-tun
-# Select a cryptographic cipher.
-cipher AES-192-CBC        # AES
-# Set log file verbosity.
-verb 3" > /etc/openvpn/$VPN/keys/${CLIENT_NAME}.ovpn
-	fi
+	# create client config file
+	cp /etc/openvpn/$VPN/client.conf /etc/openvpn/$VPN/keys/${CLIENT_NAME}.ovpn
+	sed -i "s/%%CLIENT_NAME%%/$CLIENT_NAME/" /etc/openvpn/$VPN/keys/${CLIENT_NAME}.ovpn
+	msgbox "Your client certificate has been stored under /etc/openvpn/$VPN/keys/$CLIENT_NAME the following files are needed for the client:
+ca.crt                  # Server CA file
+${CLIENT_NAME}.crt      # client certificate
+${CLIENT_NAME}.key      # private key file (should kept secret)
+${CLIENT_NAME}.ovpn     # OpenVPN configuration file for OpenVPN clients"
+	mkdir -p /etc/openvpn/$VPN/keys/$CLIENT_NAME
+	cp /etc/openvpn/$VPN/keys/ca.crt /etc/openvpn/$VPN/keys/${CLIENT_NAME}.crt /etc/openvpn/$VPN/keys/${CLIENT_NAME}.key /etc/openvpn/$VPN/keys/${CLIENT_NAME}.ovpn /etc/openvpn/$VPN/keys/${CLIENT_NAME}/
 	CC=$(whiptail --backtitle "$TITLE" --yesno "Do you want to create another client certificate for $VPN?" 0 0 3>&1 1>&2 2>&3)
 	if [ $? -eq 0 ]; then
 		create_client_certificate

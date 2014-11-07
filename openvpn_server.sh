@@ -179,7 +179,32 @@ verb 4	# verbose mode
 # work around for mtu-size-limitation
 mssfix 1200" > /etc/openvpn/$VPNNAME/server.conf
 	ln -sf /etc/openvpn/$VPNNAME/server.conf /etc/openvpn/${VPNNAME}.conf
+	
+	# create client configuration template
+	VPNSERVER_IP=$(whiptail --backtitle "$TITLE" --title "IP of VPN-Server" --inputbox "IP address to connect to the VPN Server (external IP address or dyndns)" 0 20 "myserver.example.com" 3>&1 1>&2 2>&3)
+	if [ $? -eq 1 ]; then
+		msgbox "VPN Server IP is required, using 127.0.0.1 for now, please adapt /etc/openvpn/$VPNNAME/client.conf manually."
+		VPNSERVER_IP="127.0.0.1"
+	fi
+	echo "client
+dev tun
+port 1194
+proto udp
 
+remote $VPNSERVER_IP 1194		# VPN server IP : PORT
+nobind
+
+ca ca.crt
+cert %%CLIENT_NAME%%.crt
+key %%CLIENT_NAME%%.key
+
+comp-lzo
+persist-key
+persist-tun
+# Select a cryptographic cipher.
+cipher AES-192-CBC        # AES
+# Set log file verbosity.
+verb 3" > /etc/openvpn/$VPNNAME/client.conf
 	
 	# create empty revocation list
 	[ -f /etc/openvpn/$VPNNAME/keys/crl.pem ] || touch /etc/openvpn/$VPNNAME/keys/crl.pem 
