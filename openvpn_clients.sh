@@ -38,8 +38,7 @@ create_client_certificate()
 {
 	CLIENT_NAME=$(whiptail --backtitle "$TITLE" --title "Client Name" --inputbox "Name of the VPN client (e.g. hostname of the client)" 0 20 "pc-client-1" 3>&1 1>&2 2>&3)
 	if [ $? -eq 0 ] && [ "x$CLIENT_NAME" != "x" ]; then
-		msgbox "You've been ask to add \"extra\" attributes, please choose a secure password here to prevent other people to use your certificate without authorization"
-		./build-key $CLIENT_NAME
+		./build-key-pass $CLIENT_NAME
 	else
 		return 0
 	fi
