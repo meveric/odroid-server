@@ -19,6 +19,7 @@ do
 		" 9" "Install and configure OpenVPN (VPN Server)" \
 		" 9.1" "        Create Client Certificates for VPN" \
 		"10" "Install and configure PPPOE (DSL Internet connection - on eth0)" \
+		"11" "Install and configure Jabber (XMPP) Server - Openfire" \
                 3>&1 1>&2 2>&3)
 
 	RET=$?
@@ -47,6 +48,7 @@ Do you want to reboot now?" 0 0 3>&1 1>&2 2>&3)
 		" 9") . $HOMEDIR/openvpn_server.sh ;;
 		" 9.1") . $HOMEDIR/openvpn_clients.sh ;;
 		"10") . $HOMEDIR/pppoe.sh ;;
+		"11") . $HOMEDIR/jabber_server.sh;;
 		*) msgbox "Error 001. Please report on the forums" && exit 0 ;;
 		esac || msgbox "I don't know how you got here! >> $CC <<  Report on the forums"
 	fi
