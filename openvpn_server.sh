@@ -179,7 +179,14 @@ verb 4	# verbose mode
 # work around for mtu-size-limitation
 mssfix 1200" > /etc/openvpn/$VPNNAME/server.conf
 	ln -sf /etc/openvpn/$VPNNAME/server.conf /etc/openvpn/${VPNNAME}.conf
-	
+	# we need to push a network to the VPN
+	VPNSERVER_NETWORK=$(whiptail --backtitle "$TITLE" --title "Local Network to be used for VPN-Server" --inputbox "What's the local network (and netmask) that should be used through the VPN? (for example: 192.168.123.0 255.255.255.0)" 0 20 "192.168.123.0 255.255.255.0" 3>&1 1>&2 2>&3)
+	if [ $? -eq 1 ]; then
+		msgbox "You didn't use a local network for your VPN."
+	fi
+	if [ "x$VPNSERVER_NETWORK" != "x" ]; then
+		echo "push \"route $VPNSERVER_NETWORK\"" >> /etc/openvpn/$VPNNAME/server.conf
+	fi
 	# create client configuration template
 	VPNSERVER_IP=$(whiptail --backtitle "$TITLE" --title "IP of VPN-Server" --inputbox "IP address to connect to the VPN Server (external IP address or dyndns)" 0 20 "myserver.example.com" 3>&1 1>&2 2>&3)
 	if [ $? -eq 1 ]; then
