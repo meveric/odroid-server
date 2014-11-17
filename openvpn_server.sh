@@ -162,7 +162,7 @@ ca		/etc/openvpn/$VPNNAME/keys/ca.crt	# generated keys
 cert		/etc/openvpn/$VPNNAME/keys/${HOST}.crt
 key		/etc/openvpn/$VPNNAME/keys/${HOST}.key	# keep secret
 dh		/etc/openvpn/$VPNNAME/keys/dh${KEY_STRENGTH}.pem
-crl-verify	/etc/openvpn/$VPNNAME/keys/crl.pem
+#crl-verify	/etc/openvpn/$VPNNAME/keys/crl.pem
 
 server 10.9.8.0 255.255.255.0  # internal tun0 connection IP
 ifconfig-pool-persist /etc/openvpn/$VPNNAME/ipp.txt
