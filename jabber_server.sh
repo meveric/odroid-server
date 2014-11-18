@@ -12,7 +12,7 @@ install_jabber()
 {
 	if [ `which java | wc -l` -lt 1 ]; then
 		get_updates
-		apt-get install -y openjdk-6-jre-headless
+		apt-get install -y openjdk-6-jre
 	else
 		if [ `dpkg --list | grep openjdk-7-jre-headless | grep -v ^rc | wc -l` -ge 1 ]; then
 			msgbox "Openfire seems to have issues with openjdk-7 so we have to replace it with openjdk-6"
@@ -24,6 +24,7 @@ install_jabber()
 				msgbox "Aborting setup"
 				return 0
 			fi
+		fi
 	fi
 	# get openfire (right now version 3.9.3)
 	if [ -f openfire.deb ]; then
