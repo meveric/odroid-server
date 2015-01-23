@@ -69,7 +69,8 @@ Do you want to activate a DNS-forwarder?" 0 0 3>&1 1>&2 2>&3)
 		# make sure we have our own space for configs
 		if [ ! -d /etc/bind/conf.d/ ]; then
 			mkdir /etc/bind/conf.d/
-			chmod 755 /etc/bind/conf.d
+			chmod 775 /etc/bind/conf.d
+			chgrp bind /etc/bind/conf.d
 		fi
 		CURRENT_DNS=`cat /etc/resolv.conf  | grep ^nameserver | head -n 1 | awk '{print $2}'`		
 		FORWARDER=$(whiptail --backtitle "$TITLE" --title "DNS-Forwareder" --inputbox "IP-Address for DNS forwarding" 0 20 "$CURRENT_DNS" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
