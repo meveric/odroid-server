@@ -325,8 +325,16 @@ enable_autodns()
 	# make sure DHCP is configured to allow autodns
 	sed -i "s/ddns-update-style.*/ddns-update-style interim;/" /etc/dhcp/dhcpd.conf
 	sed -i "s/^#authoritative;/authoritative;/" /etc/dhcp/dhcpd.conf
+	# TODO check if /etc/bind/rndc.key exists
 	if [ `grep "include \"/etc/bind/rndc.key\"" /etc/dhcp/dhcpd.conf | wc -l` -lt 1 ]; then
-		echo "include \"/etc/bind/rndc.key\"" >> /etc/dhcp/dhcpd.conf
+		# make sure to include rndc.key BEFORE calling any config files
+		if [ `grep "^include \"/etc/bind/rndc.key\"" /etc/dhcp/dhcpd.conf | wc -l` -lt 1 ]; then
+			if [ `grep "/etc\/dhcp\/conf.d\/config.*" | wc -l` -ge 1 ]; then
+				sed -i "\/etc\/dhcp\/conf.d\/config.*/iinclude \"/etc/bind/rndc.key\";/" /etc/dhcp/dhcpd.conf
+			else
+				echo "include \"/etc/bind/rndc.key\";" >> /etc/dhcp/dhcpd.conf
+			fi
+		fi
 	fi
 	msgbox "Please Select the DNS-ZONE you want to add to $SUBNET"
 	select_dnszone
