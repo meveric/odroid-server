@@ -47,6 +47,25 @@ configure_mumble()
 		fi
 		sed -i "s/^port=.*/port=$PORT/" /etc/mumble-server.ini
 	fi
+	CC=$(whiptail --backtitle "$TITLE" --yesno "Do you want to change the maximal audio quality of the server?" 0 0 3>&1 1>&2 2>&3)
+	if [ $? -eq 0 ]; then
+		CC=$(whiptail --backtitle "$TITLE" --menu "Main Menu" 0 0 1 --cancel-button "Exit" --ok-button "Select" \
+			"1" " 64kbit (low quality)" \
+			"2" " 72kbit (standard quality)" \
+			"3" "128kbit (high quality)" \
+		3>&1 1>&2 2>&3)
+		if [ $? -eq 1 ]; then
+			msgbox "keeping current settings"
+		else
+			case "$CC" in
+				"1") sed -i "s/^bandwidth=.*/bandwidth=64000/" /etc/mumble-server.ini ;;
+				"2") sed -i "s/^bandwidth=.*/bandwidth=72000/" /etc/mumble-server.ini ;;
+				"3") sed -i "s/^bandwidth=.*/bandwidth=128000/" /etc/mumble-server.ini ;;
+				*) msgbox "Error 008. Please report on the forums" && exit 0 ;;
+			esac
+		fi
+	fi
+
 	start_server
 }
 
