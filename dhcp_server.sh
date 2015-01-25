@@ -184,6 +184,8 @@ Please make sure not to use more then fit in your subnet."
 	echo "include \"/etc/dhcp/conf.d/config.$NUM_CONFIG\";" >> /etc/dhcp/dhcpd.conf
 	# make sure dhcp runs on $adapter
 	sed -i "s/^INTERFACES.*/INTERFACES=\"$adapter\"/" /etc/default/isc-dhcp-server
+	# fixing permission issues
+	chown -R dhcpd:dhcpd /var/lib/dhcp
 	# restart dhcp server
 	service isc-dhcp-server restart
 	if [ $? -ne 0 ]; then
