@@ -65,7 +65,8 @@ configure_mumble()
 			esac
 		fi
 	fi
-
+	# configure superuser and priority
+	dpkg-reconfigure mumble-server
 	start_server
 }
 
