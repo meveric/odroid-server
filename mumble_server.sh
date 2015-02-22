@@ -4,11 +4,11 @@ intro()
 	msgbox "With a Mumble Server your server can act as a Low latency VoIP server allowing you to make calls and talk over microphone with multiple people at once."
 	CC=$(whiptail --backtitle "$TITLE" --yesno "Do you want to install and configure a Mumble Server now?" 0 0 3>&1 1>&2 2>&3)
 	if [ $? -eq 0 ]; then
-		install_jabber
+		install_mumble
 	fi
 }
 
-install_jabber()
+install_mumble()
 {
 	get_updates
 	apt-get install -y mumble-server
