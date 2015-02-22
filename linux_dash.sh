@@ -27,6 +27,7 @@ install_linux_dash()
 You can access Linux Dash by pointing your browser to http://`hostname`/linux-dash/"
 	# configure? TODO add .htaccess or something?
 #	configure_linux_dash
+	start_server
 }
 
 configure_linux_dash()
