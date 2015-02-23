@@ -13,7 +13,7 @@ do
 		" 4.1" "        Advanced DHCP Configuration" \
                 " 5" "Install and configure DNS-Server (Bind) - (basic functions only)" \
 		" 5.1" "        Advanced DNS Configuration (WIP)" \
-                " 6" "Install and configure OwnCloud Server - (NOT INCLUDED YET)" \
+                " 6" "Install and configure OwnCloud Server - (Own private cloud server)" \
 		" 7" "Install and configure Samba 4 Active Directory Domain" \
 		" 8" "Install and configure Samba Server (Windows File Sharing) - (NOT INCLUDED YET)" \
 		" 9" "Install and configure OpenVPN (VPN Server)" \
