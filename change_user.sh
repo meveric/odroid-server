@@ -38,7 +38,7 @@ ask_for_user()
 		msgbox "User $OLDNAME seems not to exist, or the user has no home folder..."
 		return
 	fi
-	msgbox "New user names should only conist of small letters and numbers starting with a number is not allowed."
+	msgbox "New user names should only include small letters and numbers starting with a number is not allowed."
 	NEWNAME=$(whiptail --backtitle "$TITLE" --inputbox "new user name (e.g. odroid):" 0 20 "" --cancel-button "Exit" --ok-button "Select" 3>&1 1>&2 2>&3)
 	if [ $? -eq 1 ]; then
 		return
