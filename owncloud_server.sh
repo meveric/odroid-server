@@ -2,7 +2,7 @@
 intro()
 {
 	msgbox "With OwnCloud you can create your own personal Cloud Server similar to Dropbox to store and organize your files and sync them between devices, all while having complete control over your files and not giving your files to a third party."
-	CC=$(whiptail --backtitle "$TITLE" --yesno "Do you want to install and configure a Linux Dash now?" 0 0 3>&1 1>&2 2>&3)
+	CC=$(whiptail --backtitle "$TITLE" --yesno "Do you want to install and configure a OwnCloud Server now?" 0 0 3>&1 1>&2 2>&3)
 	if [ $? -eq 0 ]; then
 		install_owncloud
 	fi
