@@ -30,39 +30,53 @@ install_owncloud()
 
 configure_owncloud()
 {
+	skip=0
 	CC=$(whiptail --backtitle "$TITLE" --yesno "OwnCloud uses a database to store information about users and calendars, contacts, etc.
 You can either use the build in SQLite database, or a MySQL/MariaDB database, or a PostgreSQL database. For easy usage a MySQL database was already installed.
 
 Do you want to setup a mysql database and user for OwnCloud server?" 0 0 3>&1 1>&2 2>&3)
 	if [ $? -eq 1 ]; then
-		return 0
+		skip=1
 	fi
-	# TODO: setup mysql server
-	DATABASE_NAME=$(whiptail --backtitle "$TITLE" --title "Database Name" --inputbox "Please define a name for the OwnCloud mysql database:" 0 20 "owncloud" 3>&1 1>&2 2>&3)
-	if [ $? -eq 1 ] || [ "x$DATABASE_NAME" == "x" ]; then
-		msgbox "Skipping MySQL configuration"
-		return 0
+	# MySQL setup
+	if [ $skip -eq 0 ]; then
+		DATABASE_NAME=$(whiptail --backtitle "$TITLE" --title "Database Name" --inputbox "Please define a name for the OwnCloud mysql database:" 0 20 "owncloud" 3>&1 1>&2 2>&3)
+		if [ $? -eq 1 ] || [ "x$DATABASE_NAME" == "x" ]; then
+			msgbox "Skipping MySQL configuration"
+			skip=1
+		fi
 	fi
-	DATABASE_USER=$(whiptail --backtitle "$TITLE" --title "Database User" --inputbox "Please define a name for the database user:" 0 20 "owncloud" 3>&1 1>&2 2>&3)
-	if [ $? -eq 1 ] || [ "x$DATABASE_USER" == "x" ]; then
-		msgbox "Skipping MySQL configuration"
-		return 0
+	if [ $skip -eq 0 ]; then
+		DATABASE_USER=$(whiptail --backtitle "$TITLE" --title "Database User" --inputbox "Please define a name for the database user:" 0 20 "owncloud" 3>&1 1>&2 2>&3)
+		if [ $? -eq 1 ] || [ "x$DATABASE_USER" == "x" ]; then
+			msgbox "Skipping MySQL configuration"
+			skip=1
+		fi
 	fi
-	USER_PW=$(whiptail --backtitle "$TITLE" --title "User Password" --passwordbox "Please select a password for your MySQL user" 0 20 3>&1 1>&2 2>&3)
-	if [ $? -eq 1 ] || [ "x$USER_PW" == "x" ]; then
-		msgbox "Skipping MySQL configuration"
-		return 0
+	if [ $skip -eq 0 ]; then
+		USER_PW=$(whiptail --backtitle "$TITLE" --title "User Password" --passwordbox "Please select a password for your MySQL user" 0 20 3>&1 1>&2 2>&3)
+		if [ $? -eq 1 ] || [ "x$USER_PW" == "x" ]; then
+			msgbox "Skipping MySQL configuration"
+			skip=1
+		fi
 	fi
-	echo "CREATE DATABASE $DATABASE_NAME;" | mysql --defaults-file=/etc/mysql/debian.cnf
-	if [ $? -ne 0 ]; then
-		msgbox "Something went wrong while creating database \"$DATABASE_NAME\" please check output and fix issues, or report to forums"
-		exit 100
+	if [ $skip -eq 0 ]; then
+		echo "CREATE DATABASE $DATABASE_NAME;" | mysql --defaults-file=/etc/mysql/debian.cnf
+		if [ $? -ne 0 ]; then
+			msgbox "Something went wrong while creating database \"$DATABASE_NAME\" please check output and fix issues, or report to forums"
+			exit 100
+		fi
+		echo "GRANT ALL PRIVILEGES ON ${DATABASE_NAME}.* TO '$DATABASE_USER'@'localhost' IDENTIFIED BY '$USER_PW';" | mysql --defaults-file=/etc/mysql/debian.cnf
+		if [ $? -ne 0 ]; then
+			msgbox "Something went wrong while creating database user \"$DATABASE_USER\" please check output and fix issues, or report to forums"
+			exit 101
+		fi
 	fi
-	echo "GRANT ALL PRIVILEGES ON ${DATABASE_NAME}.* TO '$DATABASE_USER'@'localhost' IDENTIFIED BY '$USER_PW';" | mysql --defaults-file=/etc/mysql/debian.cnf
-	if [ $? -ne 0 ]; then
-		msgbox "Something went wrong while creating database user \"$DATABASE_USER\" please check output and fix issues, or report to forums"
-		exit 101
+	# configure UTF-8
+	if [ `grep "php_value default_charset UTF-8" /etc/apache2/conf-enabled/owncloud.conf | wc -l` -lt 1 ]; then
+		sed -i "/<\/Directory>/i\ \ \ \ php_value default_charset UTF-8" /etc/apache2/conf-enabled/owncloud.conf
 	fi
+		
 	return 0
 }
 
