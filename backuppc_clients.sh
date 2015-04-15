@@ -39,6 +39,9 @@ add_system()
 							msgbox "Something went wrong please follow the information given next:"
 							info_rsync
 							return
+						else
+							msgbox "$PCNAME was successfully added to BackupPC.
+You can see the system status in on the WebInterface."
 						fi
 					else
 						msgbox "Empty password given. Please follow the directions shown next."
