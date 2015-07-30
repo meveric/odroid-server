@@ -2,8 +2,7 @@
 
 intro()
 {
-	msgbox "Here you can change the userid of a existing user to a different userid (e.g. rename the default user).
-This will only work if the user is not logged in at the moment!!!"
+	msgbox "Here you can change the userid of a existing user to a different userid (e.g. rename the default user)."
         CC=$(whiptail --backtitle "$TITLE" --yesno "Do you want to rename a user now?" 0 0 3>&1 1>&2 2>&3)
         if [ $? -eq 0 ]; then
                 ask_for_user
@@ -29,8 +28,7 @@ ask_for_user()
 	for users in `ps aux | awk '{ print $1 }'`
 	do
 		if [ "x$users" == "x$OLDNAME" ]; then
-			msgbox "User $OLDNAME is still logged on.. Renaming does not work if the user is still logged in or has services running under the same name"
-			return
+			LOGGED_IN="yes"
 		fi
 	done
 	# check if user exists in /home
@@ -52,10 +50,18 @@ ask_for_user()
 			NEWNAME=`echo $NEWNAME | tr [:upper:] [:lower:]`
 			CC=$(whiptail --backtitle "$TITLE" --yesno "Are you sure you want to rename $OLDNAME to $NEWNAME?" 0 0 3>&1 1>&2 2>&3)
 			if [ $? -eq 0 ]; then
-				usermod -l $NEWNAME $OLDNAME
-				groupmod -n $NEWNAME $OLDNAME
-				mv /home/$OLDNAME /home/$NEWNAME/
-				usermod -d /home/$NEWNAME $NEWNAME
+				if [ "x$LOGGED_IN" == "xyes" ]; then
+					msgbox "User $OLDNAME is still logged on.. Renaming will only work after reboot."
+					sed -i "/^exit 0/i\/usr\/local\/sbin\/replace-user $OLDNAME $NEWNAME"    "/etc/rc.local"
+					cp replace-user /usr/local/sbin/
+					chmod +x /usr/local/sbin/replace-user
+					REBOOT=1
+				else
+					usermod -l $NEWNAME $OLDNAME
+					groupmod -n $NEWNAME $OLDNAME
+					mv /home/$OLDNAME /home/$NEWNAME/
+					usermod -d /home/$NEWNAME $NEWNAME
+				fi
 			else
 				return
 			fi
