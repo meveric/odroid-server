@@ -3,5 +3,5 @@ usermod -l $2 $1
 groupmod -n $2 $1
 mv /home/$1 /home/$2/
 usermod -d /home/$2 $2
-sed -i "s/replace-user.*//" /etc/rc.local
+sed -i "s/\/usr\/local\/sbin\/replace-user.*//" /etc/rc.local
 reboot
