@@ -7,6 +7,7 @@ menu_maintenance()
 		" 2" "Change Hostname" \
 		" 3" "Resize partition to full size" \
 		" 4" "Change username" \
+		" 5" "Change password" \
 		3>&1 1>&2 2>&3)
 	if [ $?	-eq 1 ]; then
 		return
@@ -16,6 +17,7 @@ menu_maintenance()
 		" 2") . $HOMEDIR/change_hostname.sh ;;
 		" 3") . $HOMEDIR/fs_resize.sh ;;
 		" 4") . $HOMEDIR/change_user.sh;;
+		" 5") . $HOMEDIR/change_password.sh;;
 		*) msgbox "Error 001. Please report on the forums" && exit 0 ;;
 		esac || msgbox "I don't know how you got here! >> $CC <<  Report on the forums"
 	fi
