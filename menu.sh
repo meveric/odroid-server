@@ -32,7 +32,7 @@ menu_install()
 		" 2.1" "        Advanced DNS Configuration (WIP)" \
 		" 3" "Install and configure OwnCloud Server - (Own private cloud server)" \
 		" 4" "Install and configure Samba 4 Active Directory Domain" \
-		" 5" "Install and configure Samba Server (Windows File Sharing) - (NOT INCLUDED YET)" \
+		" 5" "Install and configure Samba Server (Windows File Sharing)" \
 		" 6" "Install and configure OpenVPN (VPN Server)" \
 		" 6.1" "        Create Client Certificates for VPN" \
 		" 7" "Install and configure PPPOE (DSL Internet connection - on eth0)" \
