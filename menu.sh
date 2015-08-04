@@ -33,6 +33,7 @@ menu_install()
 		" 3" "Install and configure OwnCloud Server - (Own private cloud server)" \
 		" 4" "Install and configure Samba 4 Active Directory Domain" \
 		" 5" "Install and configure Samba Server (Windows File Sharing)" \
+		" 5.1" "        Advanced Samba Server Configuration" \
 		" 6" "Install and configure OpenVPN (VPN Server)" \
 		" 6.1" "        Create Client Certificates for VPN" \
 		" 7" "Install and configure PPPOE (DSL Internet connection - on eth0)" \
@@ -53,6 +54,7 @@ menu_install()
 		" 3") . $HOMEDIR/owncloud_server.sh ;;
 		" 4") . $HOMEDIR/ad_server.sh ;;
 		" 5") . $HOMEDIR/samba_server.sh ;;
+		" 5.1") . $HOMEDIR/advanced_samba_server.sh ;;
 		" 6") . $HOMEDIR/openvpn_server.sh ;;
 		" 6.1") . $HOMEDIR/openvpn_clients.sh ;;
 		" 7") . $HOMEDIR/pppoe.sh ;;
