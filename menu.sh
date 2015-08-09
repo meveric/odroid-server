@@ -42,6 +42,7 @@ menu_install()
 		"10" "Install and configure Linux Dash (WebBased System Monitor)" \
 		"11" "Install and configure BackupPC (Linux system backup software)" \
 		"11.1" "        Configure clients for BackupPC" \
+		"12" "Install and configure minidlna daemon" \
 		3>&1 1>&2 2>&3)
 	if [ $? -eq 1 ]; then
 		return
@@ -63,6 +64,7 @@ menu_install()
 		"10") . $HOMEDIR/linux_dash.sh;;
 		"11") . $HOMEDIR/backuppc.sh;;
 		"11.1") . $HOMEDIR/backuppc_clients.sh;;
+		"12") . $HOMEDIR/minidlna.sh ;;
 		*) msgbox "Error 001. Please report on the forums" && exit 0 ;;
 		esac || msgbox "I don't know how you got here! >> $CC <<  Report on the forums"
 	fi
