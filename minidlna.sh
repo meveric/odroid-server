@@ -47,7 +47,6 @@ configure_dlna()
 		echo "fs.inotify.max_user_watches=65536" >> /etc/sysctl.conf
 		sysctl -p
 	fi
-	fi
 	# setup inotify in minidlna
 	if [ `grep "^inotify=yes" /etc/minidlna.conf | wc -l` -lt 1 ]; then
 		echo "inotify=yes" >> /etc/minidlna.conf
@@ -55,7 +54,6 @@ configure_dlna()
 	if [ `grep "^notify_interval=300" /etc/minidlna.conf | wc -l` -lt 1 ]; then
 		echo "notify_interval=300" >> /etc/minidlna.conf
 	fi
-			
 	restart_server
 }
 
